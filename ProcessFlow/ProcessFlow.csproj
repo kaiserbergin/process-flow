@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Process.Flow</PackageId>
+    <Authors>kaiserbergin</Authors>
+    <Company>N/A</Company>
+    <Product>Process Flow</Product>
+    <Description>A framework for handling process flows.</Description>
+    <PackageProjectUrl>https://github.com/kaiserbergin/process-flow</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kaiserbergin/process-flow</RepositoryUrl>
+    <RepositoryType>github</RepositoryType>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
