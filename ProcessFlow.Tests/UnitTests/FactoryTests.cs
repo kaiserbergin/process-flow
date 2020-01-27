@@ -28,6 +28,22 @@ namespace ProcessFlow.Tests.UnitTests
         }
 
         [Fact]
+        public void GetProcessorTypeArgTest()
+        {
+            // Arrange
+            var actions = GetProcessors();
+            var expected = actions[1];
+            var factory = new WorkflowActionFactory<string>(processors: actions);
+
+            // Act
+            var actual = factory.GetProcessor<SecondProcessor>();
+
+            // Assert
+            Assert.Equal(expected, actual);
+            Assert.NotEqual(actions.Last(), actual);
+        }
+
+        [Fact]
         public void GetStepSelectorTest()
         {
             // Arrange
@@ -37,6 +53,22 @@ namespace ProcessFlow.Tests.UnitTests
 
             // Act
             var actual = factory.GetStepSelector(expected.GetType());
+
+            // Assert
+            Assert.Equal(expected, actual);
+            Assert.NotEqual(actions.Last(), actual);
+        }
+
+        [Fact]
+        public void GetStepSelectorTyepArgTest()
+        {
+            // Arrange
+            var actions = GetStepSelectors();
+            var expected = actions[2];
+            var factory = new WorkflowActionFactory<string>(stepSelectors: actions);
+
+            // Act
+            var actual = factory.GetStepSelector<ThirdStepSelector>();
 
             // Assert
             Assert.Equal(expected, actual);
