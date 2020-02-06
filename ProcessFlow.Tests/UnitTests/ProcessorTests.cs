@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using Moq;
+using ProcessFlow.Interfaces;
+using ProcessFlow.Exceptions;
 
 namespace ProcessFlow.Tests.UnitTests
 {
@@ -153,6 +156,39 @@ namespace ProcessFlow.Tests.UnitTests
             Assert.True(Guid.TryParse(newLink.StepIdentifier, out var guid));
             Assert.IsType<Guid>(guid);
             Assert.Equal(7, result.State);
+        }
+
+        [Fact]
+        public async void TestWorfklowException()
+        {
+            // Arrange
+            var stepName = "processorName";
+            var mockProcessor = new Mock<IProcessor<int>>();
+
+            mockProcessor.Setup(x => x.Process(It.IsAny<int>()))
+                .Throws(new Exception());
+
+            var step = new Step<int>(name: stepName, processor: mockProcessor.Object);
+
+            var link1 = new WorkflowChainLink()
+            {
+                StateSnapshot = 5.ToString(),
+                SequenceNumber = 0,
+                StepName = "first"
+            };
+
+            var workflowChain = new LinkedList<WorkflowChainLink>();
+            workflowChain.AddLast(link1);
+
+            var workflowState = new WorkflowState<int>
+            {
+                State = 1,
+                WorkflowChain = workflowChain
+            };
+
+            // Assert
+            var exception = await Assert.ThrowsAsync<WorkflowActionException<int>>(async () => await step.Process(workflowState));
+            Assert.Equal(workflowState, exception.WorkflowState);
         }
 
         [Fact]

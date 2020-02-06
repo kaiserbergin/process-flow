@@ -1,4 +1,5 @@
 ﻿using ProcessFlow.Data;
+using ProcessFlow.Exceptions;
 using ProcessFlow.Interfaces;
 using System;
 using System.Text.Json;
@@ -51,17 +52,24 @@ namespace ProcessFlow.Flow
 
         public async Task<WorkflowState<T>> Process(WorkflowState<T> workflowState)
         {
-            if (_processor != null)
+            try
             {
-                workflowState.State = await _processor.Process(workflowState.State);
+                if (_processor != null)
+                {
+                    workflowState.State = await _processor.Process(workflowState.State);
+                }
+
+                UpdateWorkflowChain(workflowState);
+
+                await ExecuteExtensionProcess(workflowState);
+
+                if (_processorSettings.AutoProgress)
+                    return await ProcessNext(workflowState);
             }
-
-            UpdateWorkflowChain(workflowState);
-
-            await ExecuteExtensionProcess(workflowState);
-
-            if (_processorSettings.AutoProgress)
-                return await ProcessNext(workflowState);
+            catch (Exception exception)
+            {
+                throw new WorkflowActionException<T>(exception.Message, exception.InnerException, workflowState);
+            }
 
             return workflowState;
         }
