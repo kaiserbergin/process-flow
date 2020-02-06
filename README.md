@@ -1,9 +1,9 @@
-#process-flow
+# process-flow
 Complicated processes are gross to code and hard to follow. This package attempts to make coding them less gross and less hard by piping application state through some standardized processes that allow you to change the flow of your application at runtime. Along with that, Process.Flow tracks which steps were taken as well as a snapshot of the workflow state after each successful step processes.
 
 How does it work? Glad you asked!
 
-###Basic Concepts
+### Basic Concepts
 **Steps:**
 Process.Flow is built around Steps - basic ones that process data and pass it on, and other types that do a bit more work. Each Step has a Next and Previous Step as well as settings that allow you to do stuff like automatically progress to the next step upon successful completion of the current Step. 
 
