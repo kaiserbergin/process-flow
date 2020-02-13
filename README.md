@@ -17,3 +17,5 @@ Your Steps do stuff. How? By executing classes you define that adhere to some qu
 
 More documentation to come! Sorry the initial doc is sparse, we&apos;ll get there!
 
+### Current Development
+I am currently working on a new feature to include step activities to give better information on what happens during your flow AND the ability to export / import state from the process-flow in order to accommodate flows where data may be updated by another process - like user input!  I'm excited to continue development and hope to have a working version merged in soon!
