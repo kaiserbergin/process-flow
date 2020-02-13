@@ -11,6 +11,7 @@
     <RepositoryUrl>https://github.com/kaiserbergin/process-flow</RepositoryUrl>
     <RepositoryType>github</RepositoryType>
     <Version>0.0.3</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

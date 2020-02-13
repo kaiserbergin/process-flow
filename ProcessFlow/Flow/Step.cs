@@ -61,7 +61,8 @@ namespace ProcessFlow.Flow
 
                 UpdateWorkflowChain(workflowState);
 
-                await ExecuteExtensionProcess(workflowState);
+                if (typeof(Step<T>) != this.GetType())
+                    await ExecuteExtensionProcess(workflowState);
 
                 if (_processorSettings.AutoProgress)
                     return await ProcessNext(workflowState);
@@ -110,6 +111,46 @@ namespace ProcessFlow.Flow
         {
             _previous = processor;
             return _previous;
+        }
+
+        private void OnEnter()
+        {
+
+        }
+
+        private void OnExit()
+        {
+
+        }
+
+        private void OnProcessStarted()
+        {
+
+        }
+
+        private void OnProcessCompleted()
+        {
+
+        }
+
+        private void OnProcessFailed()
+        {
+
+        }
+
+        private void OnExtensionProcessStarted()
+        {
+
+        }
+
+        private void OnExtensionProcessCompleted()
+        {
+
+        }
+
+        private void OnExtensionProcessFailed()
+        {
+
         }
     }
 }

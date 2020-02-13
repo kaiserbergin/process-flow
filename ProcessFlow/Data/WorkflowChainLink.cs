@@ -9,6 +9,7 @@ namespace ProcessFlow.Data
         public string StepName { get; set; }
         public string StepIdentifier { get; set; }
         public int SequenceNumber { get; set; }
+        public StepActivityStages StepActivy { get; set; }
         public string StateSnapshot { get; set; }
 
         public override bool Equals(object obj)
@@ -17,15 +18,17 @@ namespace ProcessFlow.Data
                    StepName == link.StepName &&
                    StepIdentifier == link.StepIdentifier &&
                    SequenceNumber == link.SequenceNumber &&
+                   StepActivy == link.StepActivy &&
                    StateSnapshot == link.StateSnapshot;
         }
 
         public override int GetHashCode()
         {
-            var hashCode = -1175237557;
+            var hashCode = -1865647952;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StepName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StepIdentifier);
             hashCode = hashCode * -1521134295 + SequenceNumber.GetHashCode();
+            hashCode = hashCode * -1521134295 + StepActivy.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StateSnapshot);
             return hashCode;
         }
