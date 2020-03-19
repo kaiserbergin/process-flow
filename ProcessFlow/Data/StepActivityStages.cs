@@ -2,16 +2,18 @@
 {
     public enum StepActivityStages
     {
-        Entered,
-        Exited,
+        Executing,      
         Processing,
-        Processed,
+        ProcessCompleted,
         ProcessFailed,
         ExtensionProcessRunning,
         ExtensionProcessCompleted,
         ExtensionProcessFailed,
-        StateRequested,
-        StateRefreshed,
-        Failed
+        StateExported,
+        StateImporting,
+        StateImportComplete,
+        StateImportFailed,
+        ExecutionComplete,
+        ExecutionFailed
     }
 }
