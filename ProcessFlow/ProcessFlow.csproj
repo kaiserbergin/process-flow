@@ -10,7 +10,7 @@
     <PackageProjectUrl>https://github.com/kaiserbergin/process-flow</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kaiserbergin/process-flow</RepositoryUrl>
     <RepositoryType>github</RepositoryType>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
