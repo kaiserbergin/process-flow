@@ -2,6 +2,7 @@
 using ProcessFlow.Exceptions;
 using ProcessFlow.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -19,12 +20,15 @@ namespace ProcessFlow.Flow
 
         private IProcessor<T> _processor;
 
-        public Step(string name = null, string id = null, StepSettings stepSettings = null, IProcessor<T> processor = null)
+        private IClock _clock;
+
+        public Step(string name = null, string id = null, StepSettings stepSettings = null, IProcessor<T> processor = null, IClock clock = null)
         {
             Name = name ?? GetType().Name.ToString();
             Id = id ?? Guid.NewGuid().ToString("N");
             _processorSettings = stepSettings ?? new StepSettings();
             _processor = processor;
+            _clock = clock ?? new Clock();
         }
 
         public Step()
@@ -54,21 +58,29 @@ namespace ProcessFlow.Flow
         {
             try
             {
+                CreateWorkflowChainLink(workflowState);
+
                 if (_processor != null)
                 {
                     workflowState.State = await _processor.Process(workflowState.State);
+                    TakeDataSnapShot(workflowState);
                 }
-
-                UpdateWorkflowChain(workflowState);
 
                 if (typeof(Step<T>) != this.GetType())
                     await ExecuteExtensionProcess(workflowState);
 
+                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionCompleted, workflowState);
+
                 if (_processorSettings.AutoProgress)
                     return await ProcessNext(workflowState);
             }
+            catch (TerminateWorkflowException)
+            {
+                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionTerminated, workflowState);
+            }
             catch (Exception exception)
             {
+                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionFailed, workflowState);
                 throw new WorkflowActionException<T>(exception.Message, exception.InnerException, workflowState);
             }
 
@@ -77,7 +89,7 @@ namespace ProcessFlow.Flow
 
         protected virtual Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState) => Task.FromResult(workflowState);
 
-        private void UpdateWorkflowChain(WorkflowState<T> workflowState)
+        private void CreateWorkflowChainLink(WorkflowState<T> workflowState)
         {
             var chain = workflowState.WorkflowChain;
             var previousLink = chain?.Last;
@@ -87,11 +99,17 @@ namespace ProcessFlow.Flow
                 StepName = Name,
                 StepIdentifier = Id,
                 SequenceNumber = previousLink?.Value?.SequenceNumber + 1 ?? 0,
-                StateSnapshot = JsonSerializer.Serialize(workflowState.State)
+                StepActivities = new List<StepActivity> { new StepActivity(StepActivityStages.Executing, _clock.UtcNow()) }
             };
 
             chain.AddLast(link);
         }
+
+        private void TakeDataSnapShot(WorkflowState<T> workflowState) =>
+            workflowState.WorkflowChain.Last.Value.StateSnapshot = JsonSerializer.Serialize(workflowState.State);
+
+        private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowState<T> workflowState) =>
+            workflowState.WorkflowChain.Last.Value.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));
 
         private async Task<WorkflowState<T>> ProcessNext(WorkflowState<T> workflowState)
         {
@@ -111,46 +129,6 @@ namespace ProcessFlow.Flow
         {
             _previous = processor;
             return _previous;
-        }
-
-        private void OnEnter()
-        {
-
-        }
-
-        private void OnExit()
-        {
-
-        }
-
-        private void OnProcessStarted()
-        {
-
-        }
-
-        private void OnProcessCompleted()
-        {
-
-        }
-
-        private void OnProcessFailed()
-        {
-
-        }
-
-        private void OnExtensionProcessStarted()
-        {
-
-        }
-
-        private void OnExtensionProcessCompleted()
-        {
-
-        }
-
-        private void OnExtensionProcessFailed()
-        {
-
         }
     }
 }

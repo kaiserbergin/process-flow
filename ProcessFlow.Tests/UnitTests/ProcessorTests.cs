@@ -8,16 +8,21 @@ using Xunit;
 using Moq;
 using ProcessFlow.Interfaces;
 using ProcessFlow.Exceptions;
+using System.Text.Json;
 
 namespace ProcessFlow.Tests.UnitTests
 {
     public class ProcessorTests
     {
         private TestProcessor _testProcessor;
+        private Mock<IClock> _mockClock;
 
         public ProcessorTests()
         {
             _testProcessor = new TestProcessor();
+            var nowish = DateTimeOffset.UtcNow;
+            _mockClock = new Mock<IClock>();
+            _mockClock.Setup(x => x.UtcNow()).Returns(nowish);
         }
 
         [Fact]
@@ -205,9 +210,9 @@ namespace ProcessFlow.Tests.UnitTests
 
             var stepSettings = new StepSettings() { AutoProgress = true };
 
-            var firstStep = new Step<int>(name: firstStepName, id: firstStepId, stepSettings: stepSettings, processor: _testProcessor);
-            var secondStep = new Step<int>(name: secondStepName, id: secondStepId, stepSettings: stepSettings, processor: _testProcessor);
-            var thirdStep = new Step<int>(name: thirdStepName, id: thirdStepId, stepSettings: stepSettings, processor: _testProcessor);
+            var firstStep = new Step<int>(name: firstStepName, id: firstStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
+            var secondStep = new Step<int>(name: secondStepName, id: secondStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
+            var thirdStep = new Step<int>(name: thirdStepName, id: thirdStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
 
             firstStep
                 .SetNext(secondStep)
@@ -222,21 +227,24 @@ namespace ProcessFlow.Tests.UnitTests
                 StateSnapshot = 1.ToString(),
                 StepIdentifier = firstStepId,
                 StepName = firstStepName,
-                SequenceNumber = 0
+                SequenceNumber = 0,
+                StepActivities = new List<StepActivity>() { new StepActivity(StepActivityStages.Executing, clock: _mockClock.Object), new StepActivity(StepActivityStages.ExecutionCompleted, clock: _mockClock.Object) }
             };
             var secondExpectedLink = new WorkflowChainLink()
             {
                 StateSnapshot = 2.ToString(),
                 StepIdentifier = secondStepId,
                 StepName = secondStepName,
-                SequenceNumber = 1
+                SequenceNumber = 1,
+                StepActivities = new List<StepActivity>() { new StepActivity(StepActivityStages.Executing, clock: _mockClock.Object), new StepActivity(StepActivityStages.ExecutionCompleted, clock: _mockClock.Object) }
             };
             var thirdExpectedLink = new WorkflowChainLink()
             {
                 StateSnapshot = 3.ToString(),
                 StepIdentifier = thirdStepId,
                 StepName = thirdStepName,
-                SequenceNumber = 2
+                SequenceNumber = 2,
+                StepActivities = new List<StepActivity>() { new StepActivity(StepActivityStages.Executing, clock: _mockClock.Object), new StepActivity(StepActivityStages.ExecutionCompleted, clock: _mockClock.Object) }
             };
 
             expectedWorkflowChain.AddLast(firstexpectedLink);
@@ -259,7 +267,7 @@ namespace ProcessFlow.Tests.UnitTests
 
             foreach (var resultLink in result.WorkflowChain)
             {
-                Assert.Equal(currentExpectedLink.Value, resultLink);
+                Assert.Equal(JsonSerializer.Serialize(currentExpectedLink.Value), JsonSerializer.Serialize(resultLink));
 
                 currentExpectedLink = currentExpectedLink.Next;
             }

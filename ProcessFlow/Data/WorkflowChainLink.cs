@@ -9,7 +9,7 @@ namespace ProcessFlow.Data
         public string StepName { get; set; }
         public string StepIdentifier { get; set; }
         public int SequenceNumber { get; set; }
-        public StepActivityStages StepActivy { get; set; }
+        public List<StepActivity> StepActivities { get; set; } = new List<StepActivity>();
         public string StateSnapshot { get; set; }
 
         public override bool Equals(object obj)
@@ -18,17 +18,17 @@ namespace ProcessFlow.Data
                    StepName == link.StepName &&
                    StepIdentifier == link.StepIdentifier &&
                    SequenceNumber == link.SequenceNumber &&
-                   StepActivy == link.StepActivy &&
+                   EqualityComparer<List<StepActivity>>.Default.Equals(StepActivities, link.StepActivities) &&
                    StateSnapshot == link.StateSnapshot;
         }
 
         public override int GetHashCode()
         {
-            var hashCode = -1865647952;
+            var hashCode = -480268711;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StepName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StepIdentifier);
             hashCode = hashCode * -1521134295 + SequenceNumber.GetHashCode();
-            hashCode = hashCode * -1521134295 + StepActivy.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<List<StepActivity>>.Default.GetHashCode(StepActivities);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StateSnapshot);
             return hashCode;
         }
@@ -36,6 +36,16 @@ namespace ProcessFlow.Data
         public override string ToString()
         {
             return JsonSerializer.Serialize(this);
+        }
+
+        public static bool operator ==(WorkflowChainLink left, WorkflowChainLink right)
+        {
+            return EqualityComparer<WorkflowChainLink>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(WorkflowChainLink left, WorkflowChainLink right)
+        {
+            return !(left == right);
         }
     }
 }
