@@ -2,6 +2,7 @@
 using ProcessFlow.Tests.TestUtils;
 using ProcessFlow.Exceptions;
 using ProcessFlow.Data;
+using System.Linq;
 
 namespace ProcessFlow.Tests.Steps
 {
@@ -72,14 +73,16 @@ namespace ProcessFlow.Tests.Steps
 
             // Act
             var result = await originStep.Execute(_workflowState);
+            var link = result.WorkflowChain.First.Value; 
 
             // Assert
             Assert.Single(result.WorkflowChain);
-            var link = result.WorkflowChain.First.Value;
             Assert.Equal(baseStepName, link.StepName);
             Assert.Equal(originStep.Id, link.StepIdentifier);
             Assert.Equal(0, link.SequenceNumber);
-            Assert.Equal((_originalWorfklowState + 1).ToString(), link.StateSnapshot);
+            Assert.Equal(_originalWorfklowState + 1, link.GetUncompressedStateSnapshot<int>());
+            Assert.Equal(StepActivityStages.Executing, link.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionCompleted, link.StepActivities.Last().Activity);
         }
 
         [Fact]
@@ -116,9 +119,15 @@ namespace ProcessFlow.Tests.Steps
             var secondLink = result.WorkflowChain.Last.Value;
 
             Assert.Equal(originStep.Id, firstLink.StepIdentifier);
-            Assert.Equal(1.ToString(), firstLink.StateSnapshot);
+            Assert.Equal(1, firstLink.GetUncompressedStateSnapshot<int>());
             Assert.Equal(nextStep.Id, secondLink.StepIdentifier);
-            Assert.Equal(2.ToString(), secondLink.StateSnapshot);
+            Assert.Equal(2, secondLink.GetUncompressedStateSnapshot<int>());
+
+            Assert.Equal(StepActivityStages.Executing, firstLink.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionCompleted, firstLink.StepActivities.Last().Activity);
+
+            Assert.Equal(StepActivityStages.Executing, secondLink.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionCompleted, secondLink.StepActivities.Last().Activity);
         }
     }
 }
