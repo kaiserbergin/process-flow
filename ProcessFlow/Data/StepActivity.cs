@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ProcessFlow.Data
 {
+    [Serializable]
     public readonly struct StepActivity
     {
         public StepActivity(StepActivityStages activity, DateTimeOffset? dateTimeOffset = null, IClock clock = null)

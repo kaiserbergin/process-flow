@@ -2,8 +2,8 @@
 using ProcessFlow.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
+using ProcessFlow.Extensions;
 
 namespace ProcessFlow.Steps
 {
@@ -86,7 +86,7 @@ namespace ProcessFlow.Steps
         }
 
         private void TakeDataSnapShot(WorkflowState<T> workflowState) =>
-            workflowState.WorkflowChain.Last.Value.StateSnapshot = JsonSerializer.Serialize(workflowState.State);
+            workflowState.WorkflowChain.Last.Value.SetStateSnapshot(workflowState.State);
 
         private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowState<T> workflowState) =>
             workflowState.WorkflowChain.Last.Value.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));

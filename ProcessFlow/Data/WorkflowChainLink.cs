@@ -1,16 +1,22 @@
-﻿using System;
+﻿using ProcessFlow.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
 namespace ProcessFlow.Data
 {
+    [Serializable]
     public class WorkflowChainLink
     {
         public string StepName { get; set; }
         public string StepIdentifier { get; set; }
         public int SequenceNumber { get; set; }
         public List<StepActivity> StepActivities { get; set; } = new List<StepActivity>();
-        public string StateSnapshot { get; set; }
+        private byte[] StateSnapshot;    
+
+        public void SetStateSnapshot(object obj) => StateSnapshot = obj.Zippify();
+        public T GetUncompressedStateSnapshot<T>() => StateSnapshot.Unzippify<T>();
+        public byte[] GetCompressedStateSnapshot() => StateSnapshot;
 
         public override bool Equals(object obj)
         {
@@ -19,18 +25,12 @@ namespace ProcessFlow.Data
                    StepIdentifier == link.StepIdentifier &&
                    SequenceNumber == link.SequenceNumber &&
                    EqualityComparer<List<StepActivity>>.Default.Equals(StepActivities, link.StepActivities) &&
-                   StateSnapshot == link.StateSnapshot;
+                   EqualityComparer<byte[]>.Default.Equals(StateSnapshot, link.StateSnapshot);
         }
 
         public override int GetHashCode()
         {
-            var hashCode = -480268711;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StepName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StepIdentifier);
-            hashCode = hashCode * -1521134295 + SequenceNumber.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<List<StepActivity>>.Default.GetHashCode(StepActivities);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StateSnapshot);
-            return hashCode;
+            return HashCode.Combine(StepName, StepIdentifier, SequenceNumber, StepActivities, StateSnapshot);
         }
 
         public override string ToString()

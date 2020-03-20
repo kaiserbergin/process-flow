@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ProcessFlow.Data
 {
@@ -9,6 +7,7 @@ namespace ProcessFlow.Data
         DateTimeOffset UtcNow();
     }
 
+    [Serializable]
     public readonly struct Clock : IClock
     {
         public DateTimeOffset UtcNow() => DateTimeOffset.UtcNow;

@@ -48,11 +48,11 @@ namespace ProcessFlow.Tests.Steps
             var secondStepLink = result.WorkflowChain.Last.Value;
 
             Assert.Equal(sequencer.Id, sequencerStepLink.StepIdentifier);
-            Assert.Equal(0.ToString(), sequencerStepLink.StateSnapshot);
+            Assert.Equal(0, sequencerStepLink.GetUncompressedStateSnapshot<int>());
             Assert.Equal(firstStep.Id, firstStepLink.StepIdentifier);
-            Assert.Equal(1.ToString(), firstStepLink.StateSnapshot);
+            Assert.Equal(1, firstStepLink.GetUncompressedStateSnapshot<int>());
             Assert.Equal(secondStep.Id, secondStepLink.StepIdentifier);
-            Assert.Equal(2.ToString(), secondStepLink.StateSnapshot);
+            Assert.Equal(2, secondStepLink.GetUncompressedStateSnapshot<int>());
         }
 
         [Fact]
@@ -83,11 +83,11 @@ namespace ProcessFlow.Tests.Steps
             var secondStepLink = result.WorkflowChain.Last.Value;
 
             Assert.Equal(sequencer.Id, sequencerStepLink.StepIdentifier);
-            Assert.Equal(0.ToString(), sequencerStepLink.StateSnapshot);
+            Assert.Equal(0, sequencerStepLink.GetUncompressedStateSnapshot<int>());
             Assert.Equal(firstStep.Id, firstStepLink.StepIdentifier);
-            Assert.Equal(1.ToString(), firstStepLink.StateSnapshot);
+            Assert.Equal(1, firstStepLink.GetUncompressedStateSnapshot<int>());
             Assert.Equal(secondStep.Id, secondStepLink.StepIdentifier);
-            Assert.Equal(2.ToString(), secondStepLink.StateSnapshot);
+            Assert.Equal(2, secondStepLink.GetUncompressedStateSnapshot<int>());
         }
 
     }

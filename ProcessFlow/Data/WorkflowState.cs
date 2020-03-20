@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace ProcessFlow.Data
 {
+    [Serializable]
     public class WorkflowState<T>
     {
         public WorkflowState()

@@ -3,7 +3,6 @@ using ProcessFlow.Exceptions;
 using ProcessFlow.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ProcessFlow.Flow
@@ -106,7 +105,7 @@ namespace ProcessFlow.Flow
         }
 
         private void TakeDataSnapShot(WorkflowState<T> workflowState) =>
-            workflowState.WorkflowChain.Last.Value.StateSnapshot = JsonSerializer.Serialize(workflowState.State);
+            workflowState.WorkflowChain.Last.Value.SetStateSnapshot(workflowState.State);
 
         private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowState<T> workflowState) =>
             workflowState.WorkflowChain.Last.Value.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));

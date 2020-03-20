@@ -1,7 +1,9 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 
 namespace ProcessFlow.Data
 {
+    [Serializable]
     public class StepSettings
     {
         public bool AutoProgress { get; set; }
