@@ -4,7 +4,6 @@ using System.Text.Json;
 
 namespace ProcessFlow.Data
 {
-    [Serializable]
     public class WorkflowState<T>
     {
         public WorkflowState()

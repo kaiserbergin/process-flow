@@ -1,18 +1,23 @@
-﻿using System.IO;
+﻿using Polenter.Serialization;
+using System.IO;
 using System.IO.Compression;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ProcessFlow.Extensions
 {
     public static class GZipperExtensions
     {
+        private static readonly SharpSerializer _serializer;
+        static GZipperExtensions()
+        {
+            _serializer = new SharpSerializer(true);
+        }
+
         public static byte[] Zippify(this object obj)
         {
             using var memoryStream = new MemoryStream();
             using var gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, true);
 
-            var binaryFormatter = new BinaryFormatter();
-            binaryFormatter.Serialize(gZipStream, obj);
+            _serializer.Serialize(obj, gZipStream);
             return memoryStream.ToArray();
         }
 
@@ -21,8 +26,7 @@ namespace ProcessFlow.Extensions
             using var memoryStream = new MemoryStream(byteArray);
             using var gZipStream = new GZipStream(memoryStream, CompressionMode.Decompress, true);
 
-            var binaryFormatter = new BinaryFormatter();
-            return (T)binaryFormatter.Deserialize(gZipStream);
+            return (T)_serializer.Deserialize(gZipStream);
         }
     }
 }

@@ -5,7 +5,6 @@ using System.Text.Json;
 
 namespace ProcessFlow.Data
 {
-    [Serializable]
     public class WorkflowChainLink
     {
         public string StepName { get; set; }
