@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace ProcessFlow.Interfaces
 
 {
-    public interface ISelector<T>
+    public interface ISelector<T> where T : class
     {
         List<Step<T>> Options();
         Selector<T> SetOptions(List<Step<T>> options);

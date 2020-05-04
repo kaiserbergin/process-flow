@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
 {
-    public sealed class Sequencer<T> : Step<T>
+    public sealed class Sequencer<T> : Step<T> where T : class
     {
         private List<Step<T>> _sequence;
 

@@ -9,8 +9,8 @@ namespace ProcessFlow.Tests.UnitTests
 {
     public class SelectorTests
     {
-        private IProcessor<int> _processor;
-        private ISingleStepSelector<int> _stepSelector;
+        private IProcessor<SimpleWorkflowState> _processor;
+        private ISingleStepSelector<SimpleWorkflowState> _stepSelector;
 
         public SelectorTests()
         {
@@ -22,7 +22,7 @@ namespace ProcessFlow.Tests.UnitTests
         public void TestSelectorNoOptions()
         {
             // Arrange
-            var selector = new Selector<int>();
+            var selector = new Selector<SimpleWorkflowState>();
 
             // Act
             var result = selector.Options();
@@ -35,8 +35,8 @@ namespace ProcessFlow.Tests.UnitTests
         public void TestSelectorSetOptions()
         {
             // Arrange
-            var selector = new Selector<int>();
-            var options = new List<Step<int>>() { new Step<int>() };
+            var selector = new Selector<SimpleWorkflowState>();
+            var options = new List<Step<SimpleWorkflowState>>() { new Step<SimpleWorkflowState>() };
 
             // Act
             selector.SetOptions(options);
@@ -50,10 +50,10 @@ namespace ProcessFlow.Tests.UnitTests
         public async void TestSelectorSetOptionsInConstructorAndSelect()
         {
             // Arrange
-            var selector = new Selector<int>(stepSettings: new StepSettings() { AutoProgress = true }, stepSelector: _stepSelector);
+            var selector = new Selector<SimpleWorkflowState>(stepSettings: new StepSettings() { AutoProgress = true }, stepSelector: _stepSelector);
             var selectedStepName = "selectedStepName";
-            var options = new List<Step<int>>() { new Step<int>(), new Step<int>(name: selectedStepName, processor: _processor) };
-            var workflowState = new WorkflowState<int>();
+            var options = new List<Step<SimpleWorkflowState>>() { new Step<SimpleWorkflowState>(), new Step<SimpleWorkflowState>(name: selectedStepName, processor: _processor) };
+            var workflowState = new WorkflowState<SimpleWorkflowState>();
 
             // Act
             selector.SetOptions(options);
@@ -68,11 +68,11 @@ namespace ProcessFlow.Tests.UnitTests
         public async void TestSelectorSetOptionsAndSelect()
         {
             // Arrange
-            var selector = new Selector<int>(stepSettings: new StepSettings() { AutoProgress = true });
+            var selector = new Selector<SimpleWorkflowState>(stepSettings: new StepSettings() { AutoProgress = true });
             selector.SetStepSelector(_stepSelector);
             var selectedStepName = "selectedStepName";
-            var options = new List<Step<int>>() { new Step<int>(), new Step<int>(name: selectedStepName, processor: _processor) };
-            var workflowState = new WorkflowState<int>();
+            var options = new List<Step<SimpleWorkflowState>>() { new Step<SimpleWorkflowState>(), new Step<SimpleWorkflowState>(name: selectedStepName, processor: _processor) };
+            var workflowState = new WorkflowState<SimpleWorkflowState>();
 
             // Act
             selector.SetOptions(options);

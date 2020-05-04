@@ -10,11 +10,12 @@
     <PackageProjectUrl>https://github.com/kaiserbergin/process-flow</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kaiserbergin/process-flow</RepositoryUrl>
     <RepositoryType>github</RepositoryType>
-    <Version>0.0.5</Version>
+    <Version>0.0.7</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.Text.Json" Version="4.7.0" />
   </ItemGroup>
 

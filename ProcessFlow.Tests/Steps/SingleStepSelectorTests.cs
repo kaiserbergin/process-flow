@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Moq;
+﻿using System.Collections.Generic;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
 using ProcessFlow.Tests.TestUtils;
@@ -11,13 +8,13 @@ namespace ProcessFlow.Tests.Steps
 {
     public class SingleStepSelectorTests
     {
-        private WorkflowState<int> _workflowState;
-        private int _originalWorfklowState;
+        private WorkflowState<SimpleWorkflowState> _workflowState;
+        private SimpleWorkflowState _originalWorfklowState;
 
         public SingleStepSelectorTests()
         {
-            _workflowState = new WorkflowState<int>() { State = 0 };
-            _originalWorfklowState = _workflowState.State;
+            _workflowState = new WorkflowState<SimpleWorkflowState>();
+            _originalWorfklowState = _workflowState.State.DeepCopy();
         }
         
         [Fact]
@@ -27,7 +24,7 @@ namespace ProcessFlow.Tests.Steps
             var selector = new BaseSelector();
             var expectedOption = new BaseStep(name: "expectedOption");
             var option = new BaseStep(name: "option");
-            var options = new List<Step<int>>() { expectedOption, option };
+            var options = new List<Step<SimpleWorkflowState>>() { expectedOption, option };
             selector.SetOptions(options);
 
             // Act

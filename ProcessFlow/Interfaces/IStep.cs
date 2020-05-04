@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Interfaces
 {
-    public interface IStep<T>
+    public interface IStep<T> where T : class
     {
         string Id { get; }
         string Name { get; }

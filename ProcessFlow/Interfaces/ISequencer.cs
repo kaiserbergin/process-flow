@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ProcessFlow.Interfaces
 {
-    public interface ISequencer<T>
+    public interface ISequencer<T> where T : class
     {
         Sequencer<T> AddStep(Step<T> processor);
         List<Step<T>> GetSequence();

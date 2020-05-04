@@ -1,7 +1,5 @@
 ﻿using ProcessFlow.Data;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ProcessFlow.Exceptions
 {
@@ -9,7 +7,7 @@ namespace ProcessFlow.Exceptions
     {
     }
 
-    public class TerminateWorkflowException<T> : Exception
+    public class TerminateWorkflowException<T> : Exception where T : class
     {
         public WorkflowState<T> WorkflowState;
 

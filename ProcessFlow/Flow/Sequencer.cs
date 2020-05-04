@@ -1,13 +1,11 @@
 ﻿using ProcessFlow.Data;
 using ProcessFlow.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ProcessFlow.Flow
 {
-    public sealed class Sequencer<T> : Step<T>, ISequencer<T>
+    public sealed class Sequencer<T> : Step<T>, ISequencer<T> where T : class
     {
         private List<Step<T>> _sequence;
 

@@ -8,13 +8,13 @@ namespace ProcessFlow.Tests.Steps
 {
     public class StepTests
     {
-        private WorkflowState<int> _workflowState;
-        private int _originalWorfklowState;
+        private WorkflowState<SimpleWorkflowState> _workflowState;
+        private SimpleWorkflowState _originalWorfklowState;
 
         public StepTests()
         {
-            _workflowState = new WorkflowState<int>() { State = 0 };
-            _originalWorfklowState = _workflowState.State;
+            _workflowState = new WorkflowState<SimpleWorkflowState>() { State = new SimpleWorkflowState() };
+            _originalWorfklowState = _workflowState.State.DeepCopy();
         }
 
         [Fact]
@@ -24,7 +24,7 @@ namespace ProcessFlow.Tests.Steps
             var stepThatThrowsException = new ExceptionalStep();
 
             // Actsert
-            await Assert.ThrowsAsync<WorkflowActionException<int>>(async () => await stepThatThrowsException.Execute(_workflowState));
+            await Assert.ThrowsAsync<WorkflowActionException<SimpleWorkflowState>>(async () => await stepThatThrowsException.Execute(_workflowState));
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace ProcessFlow.Tests.Steps
             var result = await originStep.Execute(_workflowState);
 
             // Assert
-            Assert.Equal(_originalWorfklowState + 1, result.State);
+            Assert.Equal(_originalWorfklowState.MyInteger + 1, result.State.MyInteger);
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace ProcessFlow.Tests.Steps
             Assert.Equal(baseStepName, link.StepName);
             Assert.Equal(originStep.Id, link.StepIdentifier);
             Assert.Equal(0, link.SequenceNumber);
-            Assert.Equal(_originalWorfklowState + 1, link.GetUncompressedStateSnapshot<int>());
+            Assert.Equal(_originalWorfklowState.MyInteger + 1, link.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
             Assert.Equal(StepActivityStages.Executing, link.StepActivities.First().Activity);
             Assert.Equal(StepActivityStages.ExecutionCompleted, link.StepActivities.Last().Activity);
         }
@@ -112,16 +112,16 @@ namespace ProcessFlow.Tests.Steps
             var result = await originStep.Execute(_workflowState);
 
             // Assert
-            Assert.Equal(_originalWorfklowState + 2, result.State);
+            Assert.Equal(_originalWorfklowState.MyInteger + 2, result.State.MyInteger);
             Assert.Equal(2, result.WorkflowChain.Count);
 
             var firstLink = result.WorkflowChain.First.Value;
             var secondLink = result.WorkflowChain.Last.Value;
 
             Assert.Equal(originStep.Id, firstLink.StepIdentifier);
-            Assert.Equal(1, firstLink.GetUncompressedStateSnapshot<int>());
+            Assert.Equal(1, firstLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
             Assert.Equal(nextStep.Id, secondLink.StepIdentifier);
-            Assert.Equal(2, secondLink.GetUncompressedStateSnapshot<int>());
+            Assert.Equal(2, secondLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
 
             Assert.Equal(StepActivityStages.Executing, firstLink.StepActivities.First().Activity);
             Assert.Equal(StepActivityStages.ExecutionCompleted, firstLink.StepActivities.Last().Activity);

@@ -3,8 +3,13 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Tests.TestUtils
 {
-    public class TestProcessor : IProcessor<int>
+    public class TestProcessor : IProcessor<SimpleWorkflowState>
     {
-        public Task<int> Process(int data) => Task.FromResult(data + 1);
+        public Task<SimpleWorkflowState> Process(SimpleWorkflowState data)
+        {
+            if (data != null)
+                data.MyInteger++;
+            return Task.FromResult(data);
+        }
     }
 }

@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace ProcessFlow.Data
+﻿namespace ProcessFlow.Data
 {
-    [Serializable]
     public enum StepActivityStages
     {
         Executing,
