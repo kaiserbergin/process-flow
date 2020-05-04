@@ -11,29 +11,31 @@ namespace ProcessFlow.Tests.TestUtils
     {
     }
 
-    public class ExceptionalStep : Step<int>
+    public class ExceptionalStep : Step<SimpleWorkflowState>
     {
-        protected override Task<int> Process(int state)
+        protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
             throw new NotImplementedException();
         }
     }
 
-    public class BaseStep : Step<int>
+    public class BaseStep : Step<SimpleWorkflowState>
     {
         public BaseStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
         {
         }
 
-        protected override Task<int> Process(int state)
+        protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
-            return Task.FromResult(state += 1);
+            if (state != null)
+                state.MyInteger++;
+            return Task.FromResult(state);
         }
     }
 
-    public class BaseSelector : SingleStepSelector<int>
+    public class BaseSelector : SingleStepSelector<SimpleWorkflowState>
     {
-        protected override Task<Step<int>> Select(List<Step<int>> options, WorkflowState<int> workflowState)
+        protected override Task<Step<SimpleWorkflowState>> Select(List<Step<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState)
         {
             return Task.FromResult(options.First());
         }

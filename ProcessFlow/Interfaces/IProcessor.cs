@@ -2,7 +2,7 @@
 
 namespace ProcessFlow.Interfaces
 {
-    public interface IProcessor<T>
+    public interface IProcessor<T> where T : class
     {
         Task<T> Process(T state);
     }

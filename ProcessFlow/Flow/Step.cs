@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Flow
 {
-    public class Step<T> : IStep<T>
+    public class Step<T> : IStep<T> where T : class
     {
         public string Name { get; private set; }
         public string Id { get; private set; }

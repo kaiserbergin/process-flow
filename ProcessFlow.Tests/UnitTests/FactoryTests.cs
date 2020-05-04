@@ -2,6 +2,7 @@
 using ProcessFlow.Factory;
 using ProcessFlow.Flow;
 using ProcessFlow.Interfaces;
+using ProcessFlow.Tests.TestUtils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace ProcessFlow.Tests.UnitTests
             // Arrange
             var actions = GetProcessors();
             var expected = actions[1];
-            var factory = new WorkflowActionFactory<string>(processors: actions);
+            var factory = new WorkflowActionFactory<SimpleWorkflowState>(processors: actions);
 
             // Act
             var actual = factory.GetProcessor(expected.GetType());
@@ -33,7 +34,7 @@ namespace ProcessFlow.Tests.UnitTests
             // Arrange
             var actions = GetProcessors();
             var expected = actions[1];
-            var factory = new WorkflowActionFactory<string>(processors: actions);
+            var factory = new WorkflowActionFactory<SimpleWorkflowState>(processors: actions);
 
             // Act
             var actual = factory.GetProcessor<SecondProcessor>();
@@ -49,7 +50,7 @@ namespace ProcessFlow.Tests.UnitTests
             // Arrange
             var actions = GetStepSelectors();
             var expected = actions[2];
-            var factory = new WorkflowActionFactory<string>(stepSelectors: actions);
+            var factory = new WorkflowActionFactory<SimpleWorkflowState>(stepSelectors: actions);
 
             // Act
             var actual = factory.GetStepSelector(expected.GetType());
@@ -65,7 +66,7 @@ namespace ProcessFlow.Tests.UnitTests
             // Arrange
             var actions = GetStepSelectors();
             var expected = actions[2];
-            var factory = new WorkflowActionFactory<string>(stepSelectors: actions);
+            var factory = new WorkflowActionFactory<SimpleWorkflowState>(stepSelectors: actions);
 
             // Act
             var actual = factory.GetStepSelector<ThirdStepSelector>();
@@ -80,7 +81,7 @@ namespace ProcessFlow.Tests.UnitTests
         {
             // Arrange
             var actions = GetProcessors();
-            var factory = new WorkflowActionFactory<string>(processors: actions);
+            var factory = new WorkflowActionFactory<SimpleWorkflowState>(processors: actions);
 
             // Act
             var actual = factory.GetProcessor(1.GetType());
@@ -94,7 +95,7 @@ namespace ProcessFlow.Tests.UnitTests
         {
             // Arrange
             var actions = GetStepSelectors();
-            var factory = new WorkflowActionFactory<string>(stepSelectors: actions);
+            var factory = new WorkflowActionFactory<SimpleWorkflowState>(stepSelectors: actions);
 
             // Act
             var actual = factory.GetStepSelector(1.GetType());
@@ -104,41 +105,41 @@ namespace ProcessFlow.Tests.UnitTests
         }
 
 
-        private List<IProcessor<string>> GetProcessors() => new List<IProcessor<string>>() { new FirstProcessor(), new SecondProcessor(), new ThirdProcessor(), new SecondProcessor() };
+        private List<IProcessor<SimpleWorkflowState>> GetProcessors() => new List<IProcessor<SimpleWorkflowState>>() { new FirstProcessor(), new SecondProcessor(), new ThirdProcessor(), new SecondProcessor() };
 
-        private List<ISingleStepSelector<string>> GetStepSelectors() => new List<ISingleStepSelector<string>>() { new FirstStepSelector(), new SecondStepSelector(), new ThirdStepSelector(), new ThirdStepSelector() };
+        private List<ISingleStepSelector<SimpleWorkflowState>> GetStepSelectors() => new List<ISingleStepSelector<SimpleWorkflowState>>() { new FirstStepSelector(), new SecondStepSelector(), new ThirdStepSelector(), new ThirdStepSelector() };
     }
 
     #region Classes used soley for the factory tests
 
-    public class FirstProcessor : IProcessor<string>
+    public class FirstProcessor : IProcessor<SimpleWorkflowState>
     {
-        public Task<string> Process(string data) => Task.FromResult(data);
+        public Task<SimpleWorkflowState> Process(SimpleWorkflowState data) => Task.FromResult(data);
     }
 
-    public class SecondProcessor : IProcessor<string>
+    public class SecondProcessor : IProcessor<SimpleWorkflowState>
     {
-        public Task<string> Process(string data) => Task.FromResult(data);
+        public Task<SimpleWorkflowState> Process(SimpleWorkflowState data) => Task.FromResult(data);
     }
 
-    public class ThirdProcessor : IProcessor<string>
+    public class ThirdProcessor : IProcessor<SimpleWorkflowState>
     {
-        public Task<string> Process(string data) => Task.FromResult(data);
+        public Task<SimpleWorkflowState> Process(SimpleWorkflowState data) => Task.FromResult(data);
     }
 
-    public class FirstStepSelector : ISingleStepSelector<string>
+    public class FirstStepSelector : ISingleStepSelector<SimpleWorkflowState>
     {
-        public Task<Step<string>> Select(List<Step<string>> options, WorkflowState<string> workflowState) => Task.FromResult(options.FirstOrDefault());
+        public Task<Step<SimpleWorkflowState>> Select(List<Step<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState) => Task.FromResult(options.FirstOrDefault());
     }
 
-    public class SecondStepSelector : ISingleStepSelector<string>
+    public class SecondStepSelector : ISingleStepSelector<SimpleWorkflowState>
     {
-        public Task<Step<string>> Select(List<Step<string>> options, WorkflowState<string> workflowState) => Task.FromResult(options.FirstOrDefault());
+        public Task<Step<SimpleWorkflowState>> Select(List<Step<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState) => Task.FromResult(options.FirstOrDefault());
     }
 
-    public class ThirdStepSelector : ISingleStepSelector<string>
+    public class ThirdStepSelector : ISingleStepSelector<SimpleWorkflowState>
     {
-        public Task<Step<string>> Select(List<Step<string>> options, WorkflowState<string> workflowState) => Task.FromResult(options.FirstOrDefault());
+        public Task<Step<SimpleWorkflowState>> Select(List<Step<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState) => Task.FromResult(options.FirstOrDefault());
     }
 
     #endregion

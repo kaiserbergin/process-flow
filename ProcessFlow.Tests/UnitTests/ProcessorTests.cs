@@ -16,6 +16,7 @@ namespace ProcessFlow.Tests.UnitTests
     {
         private TestProcessor _testProcessor;
         private Mock<IClock> _mockClock;
+        private SimpleWorkflowState _simpleWorfklowState;
 
         public ProcessorTests()
         {
@@ -23,6 +24,7 @@ namespace ProcessFlow.Tests.UnitTests
             var nowish = DateTimeOffset.UtcNow;
             _mockClock = new Mock<IClock>();
             _mockClock.Setup(x => x.UtcNow()).Returns(nowish);
+            _simpleWorfklowState = new SimpleWorkflowState();
         }
 
         [Fact]
@@ -32,8 +34,8 @@ namespace ProcessFlow.Tests.UnitTests
             var firstStepName = "first";
             var secondStepName = "second";
 
-            var firstStep = new Step<int>(name: firstStepName);
-            var secondStep = new Step<int>(name: secondStepName);
+            var firstStep = new Step<SimpleWorkflowState>(name: firstStepName);
+            var secondStep = new Step<SimpleWorkflowState>(name: secondStepName);
 
             // Act
             var createdNext = firstStep.SetNext(secondStep);
@@ -49,7 +51,7 @@ namespace ProcessFlow.Tests.UnitTests
         {
             // Arrange
             var firstStepName = "first";
-            var firstStep = new Step<int>(name: firstStepName);
+            var firstStep = new Step<SimpleWorkflowState>(name: firstStepName);
 
             // Act
             var next = firstStep.Next();
@@ -65,8 +67,8 @@ namespace ProcessFlow.Tests.UnitTests
             var firstStepName = "first";
             var secondStepName = "second";
 
-            var firstStep = new Step<int>(name: firstStepName);
-            var secondStep = new Step<int>(secondStepName);
+            var firstStep = new Step<SimpleWorkflowState>(name: firstStepName);
+            var secondStep = new Step<SimpleWorkflowState>(secondStepName);
 
             // Act
             var createdPrevious = firstStep.SetPrevious(secondStep);
@@ -82,7 +84,7 @@ namespace ProcessFlow.Tests.UnitTests
         {
             // Arrange
             var firstStepName = "first";
-            var firstStep = new Step<int>(name: firstStepName);
+            var firstStep = new Step<SimpleWorkflowState>(name: firstStepName);
 
             // Act
             var next = firstStep.Previous();
@@ -96,8 +98,8 @@ namespace ProcessFlow.Tests.UnitTests
         {
             // Arrange
             var stepName = "processorName";
-            var step = new Step<int>(name: stepName, processor: _testProcessor);
-            var state = new WorkflowState<int>();
+            var step = new Step<SimpleWorkflowState>(name: stepName, processor: _testProcessor);
+            var state = new WorkflowState<SimpleWorkflowState>();
 
             // Act
             var result = await step.Process(state);
@@ -109,7 +111,6 @@ namespace ProcessFlow.Tests.UnitTests
 
             Assert.Equal(stepName, firstLink.StepName);
             Assert.Equal(0, firstLink.SequenceNumber);
-            Assert.Equal(1, firstLink.GetUncompressedStateSnapshot<int>());
         }
 
         [Fact]
@@ -117,7 +118,7 @@ namespace ProcessFlow.Tests.UnitTests
         {
             // Arrange
             var stepName = "processorName";
-            var step = new Step<int>(name: stepName, processor: _testProcessor);
+            var step = new Step<SimpleWorkflowState>(name: stepName, processor: _testProcessor);
 
             var link1 = new WorkflowChainLink()
             {
@@ -137,9 +138,9 @@ namespace ProcessFlow.Tests.UnitTests
             workflowChain.AddLast(link1);
             workflowChain.AddLast(link2);
 
-            var workflowState = new WorkflowState<int>
+            var workflowState = new WorkflowState<SimpleWorkflowState>
             {
-                State = 6,
+                State = new SimpleWorkflowState() { MyInteger = 6 },
                 WorkflowChain = workflowChain
             };
 
@@ -158,10 +159,10 @@ namespace ProcessFlow.Tests.UnitTests
 
             Assert.Equal(stepName, newLink.StepName);
             Assert.Equal(link2.SequenceNumber + 1, newLink.SequenceNumber);
-            Assert.Equal(7, newLink.GetUncompressedStateSnapshot<int>());
+            Assert.Equal(7, newLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
             Assert.True(Guid.TryParse(newLink.StepIdentifier, out var guid));
             Assert.IsType<Guid>(guid);
-            Assert.Equal(7, result.State);
+            Assert.Equal(7, result.State.MyInteger);
         }
 
         [Fact]
@@ -169,12 +170,12 @@ namespace ProcessFlow.Tests.UnitTests
         {
             // Arrange
             var stepName = "processorName";
-            var mockProcessor = new Mock<IProcessor<int>>();
+            var mockProcessor = new Mock<IProcessor<SimpleWorkflowState>>();
 
-            mockProcessor.Setup(x => x.Process(It.IsAny<int>()))
+            mockProcessor.Setup(x => x.Process(It.IsAny<SimpleWorkflowState>()))
                 .Throws(new Exception());
 
-            var step = new Step<int>(name: stepName, processor: mockProcessor.Object);
+            var step = new Step<SimpleWorkflowState>(name: stepName, processor: mockProcessor.Object);
 
             var link1 = new WorkflowChainLink()
             {
@@ -186,18 +187,18 @@ namespace ProcessFlow.Tests.UnitTests
             var workflowChain = new LinkedList<WorkflowChainLink>();
             workflowChain.AddLast(link1);
 
-            var workflowState = new WorkflowState<int>
+            var workflowState = new WorkflowState<SimpleWorkflowState>
             {
-                State = 1,
+                State = new SimpleWorkflowState() { MyInteger = 1 },
                 WorkflowChain = workflowChain
             };
 
             // Act
-            var result = await Assert.ThrowsAsync<WorkflowActionException<int>>(async () => await step.Process(workflowState));
+            var result = await Assert.ThrowsAsync<WorkflowActionException<SimpleWorkflowState>>(async () => await step.Process(workflowState));
             var link = result.WorkflowState.WorkflowChain.Last.Value;
 
             // Assert
-            Assert.Equal(workflowState, result.WorkflowState);
+            Assert.Equal(workflowState.State.MyInteger, result.WorkflowState.State.MyInteger);
             Assert.Equal(StepActivityStages.Executing, link.StepActivities.First().Activity);
             Assert.Equal(StepActivityStages.ExecutionFailed, link.StepActivities.Last().Activity);
         }
@@ -216,15 +217,15 @@ namespace ProcessFlow.Tests.UnitTests
 
             var stepSettings = new StepSettings() { AutoProgress = true };
 
-            var firstStep = new Step<int>(name: firstStepName, id: firstStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
-            var secondStep = new Step<int>(name: secondStepName, id: secondStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
-            var thirdStep = new Step<int>(name: thirdStepName, id: thirdStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
+            var firstStep = new Step<SimpleWorkflowState>(name: firstStepName, id: firstStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
+            var secondStep = new Step<SimpleWorkflowState>(name: secondStepName, id: secondStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
+            var thirdStep = new Step<SimpleWorkflowState>(name: thirdStepName, id: thirdStepId, stepSettings: stepSettings, processor: _testProcessor, clock: _mockClock.Object);
 
             firstStep
                 .SetNext(secondStep)
                 .SetNext(thirdStep);
 
-            var workflowState = new WorkflowState<int>() { State = 0 };
+            var workflowState = new WorkflowState<SimpleWorkflowState>() { State = new SimpleWorkflowState() };
 
             var expectedWorkflowChain = new LinkedList<WorkflowChainLink>();
 
@@ -259,9 +260,9 @@ namespace ProcessFlow.Tests.UnitTests
             expectedWorkflowChain.AddLast(secondExpectedLink);
             expectedWorkflowChain.AddLast(thirdExpectedLink);
 
-            var expectedWorkflowState = new WorkflowState<int>()
+            var expectedWorkflowState = new WorkflowState<SimpleWorkflowState>()
             {
-                State = 3,
+                State = new SimpleWorkflowState() { MyInteger = 3 },
                 WorkflowChain = expectedWorkflowChain
             };
 
@@ -269,7 +270,7 @@ namespace ProcessFlow.Tests.UnitTests
             var result = await firstStep.Process(workflowState);
 
             // Assert
-            Assert.Equal(expectedWorkflowState.State, result.State);
+            Assert.Equal(expectedWorkflowState.State.MyInteger, result.State.MyInteger);
 
             var currentExpectedLink = expectedWorkflowChain.First;
 

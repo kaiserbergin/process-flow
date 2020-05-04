@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ProcessFlow.Factory
 {
-    public class WorkflowActionFactory<T>
+    public class WorkflowActionFactory<T> where T : class
     {
         private List<IProcessor<T>> _processors;
         private List<ISingleStepSelector<T>> _stepSelectors;

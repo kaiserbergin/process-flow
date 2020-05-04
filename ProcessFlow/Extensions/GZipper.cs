@@ -1,32 +1,55 @@
-﻿using Polenter.Serialization;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 
 namespace ProcessFlow.Extensions
 {
     public static class GZipperExtensions
     {
-        private static readonly SharpSerializer _serializer;
-        static GZipperExtensions()
+        public static byte[] Zippify(this object objectToZip)
         {
-            _serializer = new SharpSerializer(true);
+            var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(objectToZip);
+            var bytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
+
+            using (var memory = new MemoryStream())
+            {
+                using (var gzip = new GZipStream(memory, CompressionMode.Compress))
+                {
+                    gzip.Write(bytes, 0, bytes.Length);
+                }
+
+                return memory.ToArray();
+            }
         }
 
-        public static byte[] Zippify(this object obj)
+        public static T Unzippify<T>(this byte[] bytes)
         {
-            using var memoryStream = new MemoryStream();
-            using var gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, true);
+            var jsonData = string.Empty;
 
-            _serializer.Serialize(obj, gZipStream);
-            return memoryStream.ToArray();
-        }
+            using (var stream = new GZipStream(new MemoryStream(bytes), CompressionMode.Decompress))
+            {
+                const int size = 4096;
+                var buffer = new byte[size];
 
-        public static T Unzippify<T>(this byte[] byteArray)
-        {
-            using var memoryStream = new MemoryStream(byteArray);
-            using var gZipStream = new GZipStream(memoryStream, CompressionMode.Decompress, true);
+                using (var memory = new MemoryStream())
+                {
+                    var count = 0;
 
-            return (T)_serializer.Deserialize(gZipStream);
+                    do
+                    {
+                        count = stream.Read(buffer, 0, size);
+
+                        if (count > 0)
+                        {
+                            memory.Write(buffer, 0, count);
+                        }
+                    }
+                    while (count > 0);
+
+                    jsonData = System.Text.Encoding.UTF8.GetString(memory.ToArray());
+                }
+            }
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(jsonData);
         }
     }
 }

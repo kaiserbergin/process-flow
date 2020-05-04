@@ -11,10 +11,19 @@ namespace ProcessFlow.Data
         public string StepIdentifier { get; set; }
         public int SequenceNumber { get; set; }
         public List<StepActivity> StepActivities { get; set; } = new List<StepActivity>();
-        private byte[] StateSnapshot;    
+        private byte[] StateSnapshot;
 
-        public void SetStateSnapshot(object obj) => StateSnapshot = obj.Zippify();
-        public T GetUncompressedStateSnapshot<T>() => StateSnapshot.Unzippify<T>();
+        public void SetStateSnapshot(object obj)
+        {
+            if (obj != null)
+                StateSnapshot = obj.Zippify();
+        }
+        public T GetUncompressedStateSnapshot<T>() where T : class
+        {
+            if (StateSnapshot == null)
+                return null;
+            return StateSnapshot.Unzippify<T>();
+        }
         public byte[] GetCompressedStateSnapshot() => StateSnapshot;
 
         public override bool Equals(object obj)

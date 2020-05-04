@@ -7,7 +7,7 @@ namespace ProcessFlow.Exceptions
     {
     }
 
-    public class TerminateWorkflowException<T> : Exception
+    public class TerminateWorkflowException<T> : Exception where T : class
     {
         public WorkflowState<T> WorkflowState;
 

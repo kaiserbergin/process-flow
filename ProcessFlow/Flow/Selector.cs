@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Flow
 {
-    public class Selector<T> : Step<T>, ISelector<T>
+    public class Selector<T> : Step<T>, ISelector<T> where T : class
     {
         private List<Step<T>> _options;
 

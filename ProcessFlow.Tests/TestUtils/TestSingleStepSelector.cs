@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Tests.TestUtils
 {
-    public class TestStepSelector : ISingleStepSelector<int>
+    public class TestStepSelector : ISingleStepSelector<SimpleWorkflowState>
     {
-        public Task<Step<int>> Select(List<Step<int>> options, WorkflowState<int> workflowState) => Task.FromResult(options.Last());
+        public Task<Step<SimpleWorkflowState>> Select(List<Step<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState) => Task.FromResult(options.Last());
     }
 }

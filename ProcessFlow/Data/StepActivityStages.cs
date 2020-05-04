@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ProcessFlow.Data
+﻿namespace ProcessFlow.Data
 {
     public enum StepActivityStages
     {

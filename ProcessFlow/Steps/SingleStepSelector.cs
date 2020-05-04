@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
 {
-    public abstract class SingleStepSelector<T> : Step<T>
+    public abstract class SingleStepSelector<T> : Step<T> where T : class
     {
         private List<Step<T>> _options;
         public SingleStepSelector(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)

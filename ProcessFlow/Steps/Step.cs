@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
 {
-    public abstract class Step<T>
+    public abstract class Step<T> where T : class
     {
         public string Name { get; private set; }
         public string Id { get; private set; }

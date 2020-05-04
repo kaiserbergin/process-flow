@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace ProcessFlow.Exceptions
 {
-    public class WorkflowActionException<T> : Exception
+    public class WorkflowActionException<T> : Exception where T : class
     {
         public WorkflowState<T> WorkflowState;
 
