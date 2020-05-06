@@ -1,13 +1,19 @@
-﻿using System.IO;
+﻿using Newtonsoft.Json;
+using System.IO;
 using System.IO.Compression;
 
 namespace ProcessFlow.Extensions
 {
     public static class GZipperExtensions
     {
+        private static readonly JsonSerializerSettings _serializerSettings;
+
+        static GZipperExtensions() => _serializerSettings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
+
+
         public static byte[] Zippify(this object objectToZip)
         {
-            var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(objectToZip);
+            var jsonData = JsonConvert.SerializeObject(objectToZip, _serializerSettings);
             var bytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
 
             using (var memory = new MemoryStream())
@@ -49,7 +55,7 @@ namespace ProcessFlow.Extensions
                 }
             }
 
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(jsonData);
+            return JsonConvert.DeserializeObject<T>(jsonData, _serializerSettings);
         }
     }
 }
