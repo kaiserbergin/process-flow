@@ -3,6 +3,7 @@ using ProcessFlow.Tests.TestUtils;
 using ProcessFlow.Exceptions;
 using ProcessFlow.Data;
 using System.Linq;
+using System;
 
 namespace ProcessFlow.Tests.Steps
 {
@@ -24,7 +25,10 @@ namespace ProcessFlow.Tests.Steps
             var stepThatThrowsException = new ExceptionalStep();
 
             // Actsert
-            await Assert.ThrowsAsync<WorkflowActionException<SimpleWorkflowState>>(async () => await stepThatThrowsException.Execute(_workflowState));
+            var exeception = await Assert.ThrowsAsync<WorkflowActionException<SimpleWorkflowState>>(async () => await stepThatThrowsException.Execute(_workflowState));
+
+            Assert.True(exeception.InnerException is NotImplementedException);
+            Assert.Equal(_workflowState.ToString(), exeception.WorkflowState.ToString());
         }
 
         [Fact]

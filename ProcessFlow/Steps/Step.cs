@@ -56,7 +56,7 @@ namespace ProcessFlow.Steps
             catch (Exception exception)
             {
                 AddActivityToWorkflowChainLink(StepActivityStages.ExecutionFailed, workflowState);
-                throw new WorkflowActionException<T>(exception.Message, exception.InnerException, workflowState);
+                throw new WorkflowActionException<T>("Exception in Process Flow execution. See InnerException for details." , exception, workflowState);
             }
 
             return workflowState;
