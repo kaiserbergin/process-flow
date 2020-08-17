@@ -73,7 +73,8 @@ namespace ProcessFlow.Tests.Steps
         {
             // Arrange
             var baseStepName = "base";
-            var originStep = new BaseStep(name: baseStepName);
+            var settings = new StepSettings { TrackStateChanges = true };
+            var originStep = new BaseStep(name: baseStepName, settings);
 
             // Act
             var result = await originStep.Execute(_workflowState);
@@ -85,6 +86,27 @@ namespace ProcessFlow.Tests.Steps
             Assert.Equal(originStep.Id, link.StepIdentifier);
             Assert.Equal(0, link.SequenceNumber);
             Assert.Equal(_originalWorfklowState.MyInteger + 1, link.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
+            Assert.Equal(StepActivityStages.Executing, link.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionCompleted, link.StepActivities.Last().Activity);
+        }
+
+        [Fact]
+        public async void WorkflowChainUpdatedWithSnapshot()
+        {
+            // Arrange
+            var baseStepName = "base";
+            var originStep = new BaseStep(name: baseStepName);
+
+            // Act
+            var result = await originStep.Execute(_workflowState);
+            var link = result.WorkflowChain.First.Value;
+
+            // Assert
+            Assert.Single(result.WorkflowChain);
+            Assert.Equal(baseStepName, link.StepName);
+            Assert.Equal(originStep.Id, link.StepIdentifier);
+            Assert.Equal(0, link.SequenceNumber);
+            Assert.Null(link.GetUncompressedStateSnapshot<SimpleWorkflowState>());
             Assert.Equal(StepActivityStages.Executing, link.StepActivities.First().Activity);
             Assert.Equal(StepActivityStages.ExecutionCompleted, link.StepActivities.Last().Activity);
         }
@@ -105,7 +127,7 @@ namespace ProcessFlow.Tests.Steps
             // Arrange
             var baseStepName = "base"; 
             var nextStepName = "next";
-            var settings = new StepSettings() { AutoProgress = true };
+            var settings = new StepSettings() { AutoProgress = true, TrackStateChanges = true };
 
             var originStep = new BaseStep(name: baseStepName, stepSettings: settings); 
             var nextStep = new BaseStep(name: nextStepName, stepSettings: settings);

@@ -41,12 +41,13 @@ namespace ProcessFlow.Steps
             {
                 CreateWorkflowChainLink(workflowState);
                 workflowState.State = await Process(workflowState.State);
-                TakeDataSnapShot(workflowState);
+
+                if (_stepSettings?.TrackStateChanges ?? false) TakeDataSnapShot(workflowState);
 
                 await ExecuteExtensionProcess(workflowState);
                 AddActivityToWorkflowChainLink(StepActivityStages.ExecutionCompleted, workflowState);
 
-                if (_stepSettings != null && _stepSettings.AutoProgress)
+                if (_stepSettings?.AutoProgress ?? false)
                     return await ExecuteNext(workflowState);
             }
             catch (TerminateWorkflowException)

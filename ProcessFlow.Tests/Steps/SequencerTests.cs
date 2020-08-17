@@ -23,12 +23,14 @@ namespace ProcessFlow.Tests.Steps
         public async void ProcessSequenceAfterAdd()
         {
             // Arrange
-            var sequencer = new Sequencer<SimpleWorkflowState>();
+            var settings = new StepSettings { TrackStateChanges = true };
+
+            var sequencer = new Sequencer<SimpleWorkflowState>(stepSettings: settings);
             var firstStepName = "first";
             var secondStepName = "second";
 
-            var firstStep = new BaseStep(name: firstStepName);
-            var secondStep = new BaseStep(name: secondStepName);
+            var firstStep = new BaseStep(name: firstStepName, settings);
+            var secondStep = new BaseStep(name: secondStepName, settings);
 
             sequencer.AddStep(firstStep);
             sequencer.AddStep(secondStep);
@@ -61,12 +63,14 @@ namespace ProcessFlow.Tests.Steps
         public async void ProcessSequenceAfterSet()
         {
             // Arrange
-            var sequencer = new Sequencer<SimpleWorkflowState>();
+            var settings = new StepSettings { TrackStateChanges = true };
+            var sequencer = new Sequencer<SimpleWorkflowState>(stepSettings: settings);
+
             var firstStepName = "first";
             var secondStepName = "second";
 
-            var firstStep = new BaseStep(name: firstStepName);
-            var secondStep = new BaseStep(name: secondStepName);
+            var firstStep = new BaseStep(name: firstStepName, settings);
+            var secondStep = new BaseStep(name: secondStepName, settings);
 
             var expectedSequence = new List<Step<SimpleWorkflowState>> { firstStep, secondStep };
 
