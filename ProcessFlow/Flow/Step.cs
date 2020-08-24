@@ -118,16 +118,18 @@ namespace ProcessFlow.Flow
                 return workflowState;
         }
 
-        public Step<T> SetNext(Step<T> processor)
+        public TStep SetNext<TStep>(TStep processor)
+            where TStep : Step<T>
         {
             _next = processor;
-            return _next;
+            return processor;
         }
 
-        public Step<T> SetPrevious(Step<T> processor)
+        public TStep SetPrevious<TStep>(TStep processor)
+            where TStep : Step<T>
         {
             _previous = processor;
-            return _previous;
+            return processor;
         }
     }
 }

@@ -12,8 +12,13 @@ namespace ProcessFlow.Interfaces
         Step<T> Next();
         Step<T> Previous();
         Task<WorkflowState<T>> Process(WorkflowState<T> workflowState);
-        Step<T> SetNext(Step<T> processor);
-        Step<T> SetPrevious(Step<T> processor);
+
+        TStep SetNext<TStep>(TStep processor)
+            where TStep : Step<T>;
+
+        TStep SetPrevious<TStep>(TStep processor)
+            where TStep : Step<T>;
+
         Step<T> SetProcessor(IProcessor<T> processor);
     }
 }
