@@ -50,7 +50,7 @@ namespace ProcessFlow.Steps
                 if (_stepSettings?.AutoProgress ?? false)
                     return await ExecuteNext(workflowState);
             }
-            catch (LoopControlException)
+            catch (LoopJumpException)
             {
                 throw;
             }

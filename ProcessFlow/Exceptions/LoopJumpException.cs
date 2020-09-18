@@ -2,7 +2,7 @@ using System;
 
 namespace ProcessFlow.Exceptions
 {
-    public class BreakException : LoopJumpException
+    public class LoopJumpException : Exception
     {
         
     }

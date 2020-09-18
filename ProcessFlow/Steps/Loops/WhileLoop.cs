@@ -6,52 +6,35 @@ using ProcessFlow.Exceptions;
 
 namespace ProcessFlow.Steps.Loops
 {
-    public sealed class ForLoop<T> : LoopController<T> where T : class
+    public sealed class WhileLoop<T> : LoopController<T> where T : class
     {
-        private int _iterationCount = 0;
-        private Func<T, int> _determineIterationCount;
-        private Func<T, Task<int>> _determineIterationCountAsync;
+        private Func<T, bool> _shouldContinue;
+        private Func<T, Task<bool>> _shouldContinueAsync;
 
-        public ForLoop(
-            int iterations,
+        public WhileLoop(string name = null, StepSettings stepSettings = null, List<Step<T>> steps = null) : base(name, stepSettings, steps) { }
+        public WhileLoop(
+            Func<T, bool> shouldContinue,
             string name = null,
             StepSettings stepSettings = null,
             List<Step<T>> steps = null) : base(name, stepSettings, steps)
         {
-            _iterationCount = iterations;
+            _shouldContinue = shouldContinue;
         }
-        
-        public ForLoop(
-            Func<T, int> determineIterationCount,
+
+        public WhileLoop(
+            Func<T, Task<bool>> shouldContinueAsync,
             string name = null,
             StepSettings stepSettings = null,
             List<Step<T>> steps = null) : base(name, stepSettings, steps)
         {
-            _determineIterationCount = determineIterationCount;
+            _shouldContinueAsync = shouldContinueAsync;
         }
 
-        public ForLoop(
-            Func<T, Task<int>> determineIterationCountAsync,
-            string name = null,
-            StepSettings stepSettings = null,
-            List<Step<T>> steps = null) : base(name, stepSettings, steps)
-        {
-            _determineIterationCountAsync = determineIterationCountAsync;
-        }
-
-        protected override async Task<T> Process(T state)
-        {
-            if (_determineIterationCount != null)
-                _iterationCount = _determineIterationCount(state);
-            else if (_determineIterationCountAsync != null)
-                _iterationCount = await _determineIterationCountAsync(state).ConfigureAwait(false);
-
-            return state;
-        }
+        protected override Task<T> Process(T state) => Task.FromResult(state);
 
         protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState)
         {
-            for (var i = 0; i < _iterationCount; i++)
+            while (await ShouldContinue(workflowState.State))
             {
                 try
                 {
@@ -69,9 +52,10 @@ namespace ProcessFlow.Steps.Loops
 
                 _currentIteration++;
             }
+
             return workflowState;
         }
-        
+
         private async Task Iterate(WorkflowState<T> workflowState)
         {
             foreach (var step in _steps)
@@ -82,7 +66,14 @@ namespace ProcessFlow.Steps.Loops
                 await step.Execute(workflowState);
             }
         }
+
+        private async Task<bool> ShouldContinue(T state)
+        {
+            if (_shouldContinue != null)
+                return _shouldContinue(state);
+            if (_shouldContinueAsync != null)
+                return await _shouldContinueAsync(state);
+            return true;
+        }
     }
-    
-    
 }

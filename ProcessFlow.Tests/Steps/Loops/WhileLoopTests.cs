@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,11 +9,11 @@ using Xunit;
 
 namespace ProcessFlow.Tests.Steps.Loops
 {
-    public class ForLoopTests
+    public class WhileLoopTests
     {
         private WorkflowState<SimpleWorkflowState> _workflowState;
 
-        public ForLoopTests()
+        public WhileLoopTests()
         {
             _workflowState = new WorkflowState<SimpleWorkflowState>() { State = new SimpleWorkflowState() };
         }
@@ -29,36 +28,37 @@ namespace ProcessFlow.Tests.Steps.Loops
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
 
-            int Determiner(SimpleWorkflowState workflowState) => 1;
-            Task<int> AsyncDeterminer(SimpleWorkflowState workflowState) => Task.FromResult(1);
-            
-            var forLoop = new ForLoop<SimpleWorkflowState>(1);
+            var whileLoop = new WhileLoop<SimpleWorkflowState>();
             
             // ActSert a lot because who cares...
-            forLoop.SetSteps(baseStepList);
-            Assert.Equal(baseStepList, forLoop.Steps);
+            whileLoop.SetSteps(baseStepList);
+            Assert.Equal(baseStepList, whileLoop.Steps);
             
-            forLoop.ClearSteps();
-            Assert.Empty(forLoop.Steps);
+            whileLoop.ClearSteps();
+            Assert.Empty(whileLoop.Steps);
 
-            forLoop.AddStep(step1);
-            Assert.Single(forLoop.Steps);
-            Assert.Equal(step1, forLoop.Steps.First());
+            whileLoop.AddStep(step1);
+            Assert.Single(whileLoop.Steps);
+            Assert.Equal(step1, whileLoop.Steps.First());
         }
 
+        
+        
         [Fact]
-        public async void ForLoopCompletesExecution()
+        public async void ShouldContinueTest()
         {
             // Arrange
-            var iterations = 2;
-            
+            const int iterations = 2;
+
             var step1 = new LoopStep("one");
             var step2 = new LoopStep("two");
             var step3 = new LoopStep("three");
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
             
-            var forLoop = new ForLoop<SimpleWorkflowState>(iterations, name: "foo", steps: baseStepList);
+            bool ShouldContinue(SimpleWorkflowState simpleWorkflowState) => simpleWorkflowState.MyInteger < iterations * baseStepList.Count;
+            
+            var forLoop = new WhileLoop<SimpleWorkflowState>(ShouldContinue, name: "foo", steps: baseStepList);
             
             // Act
             var result = await forLoop.Execute(_workflowState);
@@ -70,11 +70,10 @@ namespace ProcessFlow.Tests.Steps.Loops
         }
         
         [Fact]
-        public async void DetermineIterationsTest()
+        public async void ShouldContinueAsyncTest()
         {
             // Arrange
             const int iterations = 2;
-            int DetermineIterations(SimpleWorkflowState simpleWorkflowState) => iterations;
 
             var step1 = new LoopStep("one");
             var step2 = new LoopStep("two");
@@ -82,31 +81,9 @@ namespace ProcessFlow.Tests.Steps.Loops
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
             
-            var forLoop = new ForLoop<SimpleWorkflowState>(DetermineIterations, name: "foo", steps: baseStepList);
+            Task<bool> ShouldContinueAsync(SimpleWorkflowState simpleWorkflowState) => Task.FromResult(simpleWorkflowState.MyInteger < iterations * baseStepList.Count);
             
-            // Act
-            var result = await forLoop.Execute(_workflowState);
-
-            // Assert
-            Assert.Equal(iterations * baseStepList.Count, result.State.MyInteger);
-            Assert.Equal(iterations *  baseStepList.Count + 1, result.WorkflowChain.Count);
-            Assert.Equal(iterations, forLoop.CurrentIteration);
-        }
-        
-        [Fact]
-        public async void DetermineIterationsAsyncTest()
-        {
-            // Arrange
-            const int iterations = 2;
-            Task<int> DetermineIterations(SimpleWorkflowState simpleWorkflowState) => Task.FromResult(iterations);
-
-            var step1 = new LoopStep("one");
-            var step2 = new LoopStep("two");
-            var step3 = new LoopStep("three");
-
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
-            
-            var forLoop = new ForLoop<SimpleWorkflowState>(DetermineIterations, name: "foo", steps: baseStepList);
+            var forLoop = new WhileLoop<SimpleWorkflowState>(ShouldContinueAsync, name: "foo", steps: baseStepList);
             
             // Act
             var result = await forLoop.Execute(_workflowState);
@@ -118,7 +95,7 @@ namespace ProcessFlow.Tests.Steps.Loops
         }
 
         [Fact]
-        public async void BreakForLoopTest()
+        public async void BreakWhileLoopTest()
         {
             // Arrange
             var iterations = 2;
@@ -129,7 +106,7 @@ namespace ProcessFlow.Tests.Steps.Loops
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, breakStep };
             
-            var forLoop = new ForLoop<SimpleWorkflowState>(iterations, name: "foo", steps: baseStepList);
+            var forLoop = new WhileLoop<SimpleWorkflowState>(name: "foo", steps: baseStepList);
             
             // Act
             var result = await forLoop.Execute(_workflowState);
@@ -142,26 +119,29 @@ namespace ProcessFlow.Tests.Steps.Loops
         }
 
         [Fact]
-        public async void ContinueForLoopTest()
+        public async void ShouldContinueWithCaughtContinueTest()
         {
             // Arrange
-            var iterations = 2;
-            
-            var step1 = new LoopStep("one");
-            var continueStep = new StepThatThrowsContinue("break-step");
-            var step3 = new LoopStep("three");
+            const int iterations = 2;
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, continueStep, step3 };
+            var step1 = new LoopStep("one");
+            var step2 = new LoopStep("two");
+            var controlStop = new StepThatThrowsContinue("three");
+
+            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, controlStop };
+            var nonControlStepCount = baseStepList.Count(x => x.GetType() != controlStop.GetType());
             
-            var forLoop = new ForLoop<SimpleWorkflowState>(iterations, name: "foo", steps: baseStepList);
+            bool ShouldContinue(SimpleWorkflowState simpleWorkflowState) => simpleWorkflowState.MyInteger < iterations * nonControlStepCount;
+            
+            var forLoop = new WhileLoop<SimpleWorkflowState>(ShouldContinue, name: "foo", steps: baseStepList);
             
             // Act
             var result = await forLoop.Execute(_workflowState);
 
             // Assert
-            Assert.Equal(iterations , result.State.MyInteger);
-            Assert.Equal(iterations * 2 + 1, result.WorkflowChain.Count);
-            Assert.Equal(iterations, forLoop.CurrentIteration); 
-        }
+            Assert.Equal(iterations * nonControlStepCount, result.State.MyInteger);
+            Assert.Equal(iterations *  baseStepList.Count + 1, result.WorkflowChain.Count);
+            Assert.Equal(iterations, forLoop.CurrentIteration);
+        } 
     }
 }
