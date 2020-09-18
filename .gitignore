@@ -12,6 +12,9 @@
 .AppleDouble
 .LSOverride
 
+## Intellij Ignores
+.idea
+
 # Icon must end with two \r
 Icon
 
