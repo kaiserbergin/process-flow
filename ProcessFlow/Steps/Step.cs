@@ -50,6 +50,10 @@ namespace ProcessFlow.Steps
                 if (_stepSettings?.AutoProgress ?? false)
                     return await ExecuteNext(workflowState);
             }
+            catch (LoopJumpException)
+            {
+                throw;
+            }
             catch (TerminateWorkflowException)
             {
                 AddActivityToWorkflowChainLink(StepActivityStages.ExecutionTerminated, workflowState);
