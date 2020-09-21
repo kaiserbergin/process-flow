@@ -6,11 +6,11 @@ using ProcessFlow.Exceptions;
 
 namespace ProcessFlow.Steps.Loops
 {
-    public sealed class ForLoop<T> : LoopController<T> where T : class
+    public sealed class ForLoop<T> : Loop<T> where T : class
     {
         private int _iterationCount = 0;
-        private Func<T, int> _determineIterationCount;
-        private Func<T, Task<int>> _determineIterationCountAsync;
+        private Func<T, int> _setIterationCount;
+        private Func<T, Task<int>> _setIterationCountAsync;
 
         public ForLoop(
             int iterations,
@@ -22,29 +22,29 @@ namespace ProcessFlow.Steps.Loops
         }
         
         public ForLoop(
-            Func<T, int> determineIterationCount,
+            Func<T, int> setIterationCount,
             string name = null,
             StepSettings stepSettings = null,
             List<Step<T>> steps = null) : base(name, stepSettings, steps)
         {
-            _determineIterationCount = determineIterationCount;
+            _setIterationCount = setIterationCount;
         }
 
         public ForLoop(
-            Func<T, Task<int>> determineIterationCountAsync,
+            Func<T, Task<int>> setIterationCountAsync,
             string name = null,
             StepSettings stepSettings = null,
             List<Step<T>> steps = null) : base(name, stepSettings, steps)
         {
-            _determineIterationCountAsync = determineIterationCountAsync;
+            _setIterationCountAsync = setIterationCountAsync;
         }
 
         protected override async Task<T> Process(T state)
         {
-            if (_determineIterationCount != null)
-                _iterationCount = _determineIterationCount(state);
-            else if (_determineIterationCountAsync != null)
-                _iterationCount = await _determineIterationCountAsync(state).ConfigureAwait(false);
+            if (_setIterationCount != null)
+                _iterationCount = _setIterationCount(state);
+            else if (_setIterationCountAsync != null)
+                _iterationCount = await _setIterationCountAsync(state).ConfigureAwait(false);
 
             return state;
         }
@@ -70,17 +70,6 @@ namespace ProcessFlow.Steps.Loops
                 _currentIteration++;
             }
             return workflowState;
-        }
-        
-        private async Task Iterate(WorkflowState<T> workflowState)
-        {
-            foreach (var step in _steps)
-            {
-                if (step is LoopStep<T> controlStep)
-                    controlStep.SetIteration(_currentIteration);
-
-                await step.Execute(workflowState);
-            }
         }
     }
     

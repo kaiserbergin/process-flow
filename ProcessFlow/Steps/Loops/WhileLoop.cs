@@ -6,7 +6,7 @@ using ProcessFlow.Exceptions;
 
 namespace ProcessFlow.Steps.Loops
 {
-    public sealed class WhileLoop<T> : LoopController<T> where T : class
+    public sealed class WhileLoop<T> : Loop<T> where T : class
     {
         private Func<T, bool> _shouldContinue;
         private Func<T, Task<bool>> _shouldContinueAsync;
@@ -54,17 +54,6 @@ namespace ProcessFlow.Steps.Loops
             }
 
             return workflowState;
-        }
-
-        private async Task Iterate(WorkflowState<T> workflowState)
-        {
-            foreach (var step in _steps)
-            {
-                if (step is LoopStep<T> controlStep)
-                    controlStep.SetIteration(_currentIteration);
-
-                await step.Execute(workflowState);
-            }
         }
 
         private async Task<bool> ShouldContinue(T state)
