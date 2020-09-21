@@ -29,9 +29,6 @@ namespace ProcessFlow.Tests.Steps.Loops
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
 
-            int Determiner(SimpleWorkflowState workflowState) => 1;
-            Task<int> AsyncDeterminer(SimpleWorkflowState workflowState) => Task.FromResult(1);
-            
             var forLoop = new ForLoop<SimpleWorkflowState>(1);
             
             // ActSert a lot because who cares...

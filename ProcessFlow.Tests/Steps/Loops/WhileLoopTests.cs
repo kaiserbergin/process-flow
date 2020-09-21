@@ -98,8 +98,6 @@ namespace ProcessFlow.Tests.Steps.Loops
         public async void BreakWhileLoopTest()
         {
             // Arrange
-            var iterations = 2;
-            
             var step1 = new LoopStep("one");
             var step2 = new LoopStep("two");
             var breakStep = new StopThatThrowsBreak("break-step");
