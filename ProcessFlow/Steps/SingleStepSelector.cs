@@ -26,7 +26,7 @@ namespace ProcessFlow.Steps
         protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState)
         {
             var selectedProcessor = await Select(_options, workflowState);
-            this.SetNext(selectedProcessor);
+            await selectedProcessor.Execute(workflowState);
             return workflowState;
         }
 

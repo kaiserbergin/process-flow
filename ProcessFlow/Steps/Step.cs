@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
 {
-    public abstract class Step<T> where T : class
+    public abstract class Step<TState> where TState : class
     {
         public string Name { get; private set; }
         public string Id { get; private set; }
 
-        private Step<T> _next;
-        private Step<T> _previous;
+        private Step<TState> _next;
+        private Step<TState> _previous;
 
         private StepSettings _stepSettings;
         private IClock _clock;
@@ -25,17 +25,17 @@ namespace ProcessFlow.Steps
             _clock = clock ?? new Clock();
         }
 
-        public Step<T> Next()
+        public Step<TState> Next()
         {
             return _next;
         }
 
-        public Step<T> Previous()
+        public Step<TState> Previous()
         {
             return _previous;
         }
 
-        public async Task<WorkflowState<T>> Execute(WorkflowState<T> workflowState)
+        public async Task<WorkflowState<TState>> Execute(WorkflowState<TState> workflowState)
         {
             try
             {
@@ -61,7 +61,7 @@ namespace ProcessFlow.Steps
             catch (Exception exception)
             {
                 AddActivityToWorkflowChainLink(StepActivityStages.ExecutionFailed, workflowState);
-                throw new WorkflowActionException<T>("Exception in Process Flow execution. See InnerException for details." , exception, workflowState);
+                throw new WorkflowActionException<TState>("Exception in Process Flow execution. See InnerException for details." , exception, workflowState);
             }
 
             return workflowState;
@@ -69,11 +69,11 @@ namespace ProcessFlow.Steps
 
         public void Terminate() => throw new TerminateWorkflowException();
 
-        protected abstract Task<T> Process(T state);
+        protected abstract Task<TState> Process(TState state);
 
-        protected virtual Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState) => Task.FromResult(workflowState);
+        protected virtual Task<WorkflowState<TState>> ExecuteExtensionProcess(WorkflowState<TState> workflowState) => Task.FromResult(workflowState);
 
-        private void CreateWorkflowChainLink(WorkflowState<T> workflowState)
+        private void CreateWorkflowChainLink(WorkflowState<TState> workflowState)
         {
             var chain = workflowState.WorkflowChain;
             var previousLink = chain?.Last;
@@ -89,14 +89,14 @@ namespace ProcessFlow.Steps
             chain.AddLast(link);
         }
 
-        private void TakeDataSnapShot(WorkflowState<T> workflowState) =>
+        private void TakeDataSnapShot(WorkflowState<TState> workflowState) =>
             workflowState.WorkflowChain.Last.Value.SetStateSnapshot(workflowState.State);
 
-        private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowState<T> workflowState) =>
+        private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowState<TState> workflowState) =>
             workflowState.WorkflowChain.Last.Value.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));
 
 
-        protected async Task<WorkflowState<T>> ExecuteNext(WorkflowState<T> workflowState)
+        protected async Task<WorkflowState<TState>> ExecuteNext(WorkflowState<TState> workflowState)
         {
             if (_next != null)
                 return await _next.Execute(workflowState);
@@ -104,13 +104,13 @@ namespace ProcessFlow.Steps
                 return workflowState;
         }
 
-        public Step<T> SetNext(Step<T> step)
+        public Step<TState> SetNextStep(Step<TState> step)
         {
             _next = step;
             return _next;
         }
 
-        public Step<T> SetPrevious(Step<T> step)
+        public Step<TState> SetPreviousStep(Step<TState> step)
         {
             _previous = step;
             return _previous;
