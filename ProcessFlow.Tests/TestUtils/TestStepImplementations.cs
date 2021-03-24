@@ -22,9 +22,19 @@ namespace ProcessFlow.Tests.TestUtils
 
     public class BaseStep : Step<SimpleWorkflowState>
     {
-        public BaseStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        public BaseStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings) { }
+
+        protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
+            if (state != null)
+                state.MyInteger++;
+            return Task.FromResult(state);
         }
+    }
+
+    public class AnotherStepType : Step<SimpleWorkflowState>
+    {
+        public AnotherStepType(string name = null, StepSettings stepSettings = null) : base(name, stepSettings) { }
 
         protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
@@ -56,7 +66,7 @@ namespace ProcessFlow.Tests.TestUtils
             return Task.FromResult(state);
         }
     }
-        
+
     public class StepThatThrowsContinue : LoopStep<SimpleWorkflowState>
     {
         public StepThatThrowsContinue(string name = null, StepSettings stepSettings = null) : base(name, stepSettings) { }

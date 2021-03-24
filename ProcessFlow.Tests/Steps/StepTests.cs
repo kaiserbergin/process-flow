@@ -4,6 +4,7 @@ using ProcessFlow.Exceptions;
 using ProcessFlow.Data;
 using System.Linq;
 using System;
+using ProcessFlow.Steps;
 
 namespace ProcessFlow.Tests.Steps
 {
@@ -52,6 +53,29 @@ namespace ProcessFlow.Tests.Steps
             Assert.Equal(previousStep, actualpreviousStep);
             Assert.Equal(nextStep, originStep.Next());
             Assert.Equal(previousStep, originStep.Previous());
+        }
+
+        [Fact]
+        public void SetNextByType()
+        {
+            // Arrange
+            var baseStepName = "base";
+            var nextStepName = "next";
+
+            var originStep = new BaseStep(name: baseStepName);
+            var nextStep = new AnotherStepType(name: nextStepName);
+            var optionsStep = new BaseSelector();
+
+            // Act
+            var actualNextStep = originStep.SetNext(nextStep);
+            var actualOptionsStep = actualNextStep.SetNext(optionsStep);
+
+            // Assert
+            Assert.IsType<AnotherStepType>(actualNextStep);
+            Assert.Equal(nextStep, originStep.Next());
+
+            Assert.IsType<BaseSelector>(actualOptionsStep);
+            Assert.Equal(optionsStep, nextStep.Next());
         }
 
         [Fact]

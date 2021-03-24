@@ -31,9 +31,9 @@ namespace ProcessFlow.Tests.Steps
             var result = await selector.Execute(_workflowState);
 
             // Assert
-            Assert.Single(result.WorkflowChain);
+            Assert.Equal(2, result.WorkflowChain.Count);
             Assert.Equal(_originalWorfklowState, result.State);
-            Assert.Equal(selector.Next(), expectedOption);
+            Assert.Equal(result.WorkflowChain.Last.Value.StepName, expectedOption.Name);
         }
     }
 }
