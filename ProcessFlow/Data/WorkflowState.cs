@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text.Json;
+﻿
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ProcessFlow.Data
 {
@@ -13,9 +14,7 @@ namespace ProcessFlow.Data
         public LinkedList<WorkflowChainLink> WorkflowChain;
         public T State { get; set; }
 
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(this);
-        }
+        public override string ToString() =>
+            JsonConvert.SerializeObject(this);
     }
 }

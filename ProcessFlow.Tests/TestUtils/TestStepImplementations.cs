@@ -14,6 +14,10 @@ namespace ProcessFlow.Tests.TestUtils
 
     public class ExceptionalStep : Step<SimpleWorkflowState>
     {
+        public ExceptionalStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        {
+        }
+
         protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
             throw new NotImplementedException();
@@ -22,7 +26,9 @@ namespace ProcessFlow.Tests.TestUtils
 
     public class BaseStep : Step<SimpleWorkflowState>
     {
-        public BaseStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings) { }
+        public BaseStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        {
+        }
 
         protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
@@ -34,7 +40,9 @@ namespace ProcessFlow.Tests.TestUtils
 
     public class AnotherStepType : Step<SimpleWorkflowState>
     {
-        public AnotherStepType(string name = null, StepSettings stepSettings = null) : base(name, stepSettings) { }
+        public AnotherStepType(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        {
+        }
 
         protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
@@ -46,7 +54,9 @@ namespace ProcessFlow.Tests.TestUtils
 
     public class LoopStep : LoopStep<SimpleWorkflowState>
     {
-        public LoopStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings) { }
+        public LoopStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        {
+        }
 
         protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
@@ -58,7 +68,9 @@ namespace ProcessFlow.Tests.TestUtils
 
     public class StopThatThrowsBreak : LoopStep<SimpleWorkflowState>
     {
-        public StopThatThrowsBreak(string name = null, StepSettings stepSettings = null) : base(name, stepSettings) { }
+        public StopThatThrowsBreak(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        {
+        }
 
         protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
@@ -69,7 +81,9 @@ namespace ProcessFlow.Tests.TestUtils
 
     public class StepThatThrowsContinue : LoopStep<SimpleWorkflowState>
     {
-        public StepThatThrowsContinue(string name = null, StepSettings stepSettings = null) : base(name, stepSettings) { }
+        public StepThatThrowsContinue(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        {
+        }
 
         protected override Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
         {
@@ -83,6 +97,30 @@ namespace ProcessFlow.Tests.TestUtils
         protected override Task<Step<SimpleWorkflowState>> Select(List<Step<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState)
         {
             return Task.FromResult(options.First());
+        }
+    }
+
+    public class AsyncStep : Step<SimpleWorkflowState>
+    {
+        private readonly int _delayMs;
+
+        public AsyncStep(
+            int delayMs,
+            string name = null,
+            StepSettings stepSettings = null,
+            IClock clock = null) : base(name, stepSettings, clock)
+        {
+            _delayMs = delayMs;
+        }
+
+        protected override async Task<SimpleWorkflowState> Process(SimpleWorkflowState state)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(_delayMs));
+
+            if (state != null)
+                state.MyInteger++;
+
+            return state;
         }
     }
 }

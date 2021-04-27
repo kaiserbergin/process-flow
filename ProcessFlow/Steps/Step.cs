@@ -37,18 +37,17 @@ namespace ProcessFlow.Steps
 
         public async Task<WorkflowState<TState>> Execute(WorkflowState<TState> workflowState)
         {
+            var currentLink = CreateWorkflowChainLink(workflowState);
+
             try
             {
-                CreateWorkflowChainLink(workflowState);
                 workflowState.State = await Process(workflowState.State);
 
-                if (_stepSettings?.TrackStateChanges ?? false) TakeDataSnapShot(workflowState);
+                if (_stepSettings?.TrackStateChanges ?? false) TakeDataSnapShot(workflowState, currentLink);
 
                 await ExecuteExtensionProcess(workflowState);
-                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionCompleted, workflowState);
-
-                if (_stepSettings?.AutoProgress ?? false)
-                    return await ExecuteNext(workflowState);
+                
+                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionCompleted, currentLink);
             }
             catch (LoopJumpException)
             {
@@ -56,13 +55,16 @@ namespace ProcessFlow.Steps
             }
             catch (TerminateWorkflowException)
             {
-                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionTerminated, workflowState);
+                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionTerminated, currentLink);
             }
             catch (Exception exception)
             {
-                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionFailed, workflowState);
-                throw new WorkflowActionException<TState>("Exception in Process Flow execution. See InnerException for details." , exception, workflowState);
+                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionFailed, currentLink);
+                throw new WorkflowActionException<TState>("Exception in Process Flow execution. See InnerException for details.", exception, workflowState);
             }
+
+            if (_stepSettings?.AutoProgress ?? false)
+                return await ExecuteNext(workflowState);
 
             return workflowState;
         }
@@ -73,10 +75,10 @@ namespace ProcessFlow.Steps
 
         protected virtual Task<WorkflowState<TState>> ExecuteExtensionProcess(WorkflowState<TState> workflowState) => Task.FromResult(workflowState);
 
-        private void CreateWorkflowChainLink(WorkflowState<TState> workflowState)
+        private WorkflowChainLink CreateWorkflowChainLink(WorkflowState<TState> workflowState)
         {
             var chain = workflowState.WorkflowChain;
-            var previousLink = chain?.Last;
+            var previousLink = chain.Last;
 
             var link = new WorkflowChainLink()
             {
@@ -87,13 +89,15 @@ namespace ProcessFlow.Steps
             };
 
             chain.AddLast(link);
+
+            return link;
         }
 
-        private void TakeDataSnapShot(WorkflowState<TState> workflowState) =>
-            workflowState.WorkflowChain.Last.Value.SetStateSnapshot(workflowState.State);
+        private void TakeDataSnapShot(WorkflowState<TState> workflowState, WorkflowChainLink link) =>
+            link.SetStateSnapshot(workflowState.State);
 
-        private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowState<TState> workflowState) =>
-            workflowState.WorkflowChain.Last.Value.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));
+        private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowChainLink link) =>
+            link.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));
 
 
         protected async Task<WorkflowState<TState>> ExecuteNext(WorkflowState<TState> workflowState)
