@@ -1,7 +1,7 @@
 ﻿using ProcessFlow.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace ProcessFlow.Data
 {
@@ -18,12 +18,14 @@ namespace ProcessFlow.Data
             if (obj != null)
                 StateSnapshot = obj.Zippify();
         }
+
         public T GetUncompressedStateSnapshot<T>() where T : class
         {
             if (StateSnapshot == null)
                 return null;
             return StateSnapshot.Unzippify<T>();
         }
+
         public byte[] GetCompressedStateSnapshot() => StateSnapshot;
 
         public override bool Equals(object obj)
@@ -41,10 +43,8 @@ namespace ProcessFlow.Data
             return HashCode.Combine(StepName, StepIdentifier, SequenceNumber, StepActivities, StateSnapshot);
         }
 
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(this);
-        }
+        public override string ToString() =>
+            JsonConvert.SerializeObject(this);
 
         public static bool operator ==(WorkflowChainLink left, WorkflowChainLink right)
         {
