@@ -48,8 +48,6 @@ namespace ProcessFlow.Tests.PokeTests
 
             // Actssert
             await findPokemonStep.Execute(new WorkflowState<PokeState> { State = pokeState });
-
-            // Assert
         }
     }
 }
