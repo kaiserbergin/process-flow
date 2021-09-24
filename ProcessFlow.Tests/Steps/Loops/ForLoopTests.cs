@@ -71,15 +71,14 @@ namespace ProcessFlow.Tests.Steps.Loops
         {
             // Arrange
             const int iterations = 2;
-            int DetermineIterations(SimpleWorkflowState simpleWorkflowState) => iterations;
-
+            
             var step1 = new LoopStep("one");
             var step2 = new LoopStep("two");
             var step3 = new LoopStep("three");
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
             
-            var forLoop = new ForLoop<SimpleWorkflowState>(DetermineIterations, name: "foo", steps: baseStepList);
+            var forLoop = new ForLoop<SimpleWorkflowState>((SimpleWorkflowState simpleWorkflowState) => iterations, name: "foo", steps: baseStepList);
             
             // Act
             var result = await forLoop.Execute(_workflowState);
