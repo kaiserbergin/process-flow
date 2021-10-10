@@ -10,7 +10,7 @@ processes ran or how each one affected your state.
 Simply install via nuget in your favorite IDE (it's Rider), or use the command line.
 
 ```powershell
-Install-Package Process.Flow -Version 0.0.14
+Install-Package Process.Flow -Version 0.0.15
 ```
 
 ## Usage
