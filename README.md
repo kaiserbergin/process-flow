@@ -136,7 +136,7 @@ Here's where my heads at and where I want to take this
 - [x] ~~Create Basic Steps~~
 - [x] ~~Loops~~
 - [x] ~~Forks~~
-- [ ] Add WorkflowState settings to effectively act as a default for step settings
+- [x] ~~Add WorkflowState settings to effectively act as a default for step settings~~
 - [ ] Fluent step creation (I don't wanna make classes all the time)
 - [ ] Other cool stuff? 
 
