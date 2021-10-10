@@ -28,7 +28,7 @@ namespace ProcessFlow.Tests.Steps.Loops
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
 
-            var whileLoop = new WhileLoop<SimpleWorkflowState>();
+            var whileLoop = new WhileLoop<SimpleWorkflowState>(shouldContinue: state => false);
             
             // ActSert a lot because who cares...
             whileLoop.SetSteps(baseStepList);
@@ -104,7 +104,7 @@ namespace ProcessFlow.Tests.Steps.Loops
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, breakStep };
             
-            var forLoop = new WhileLoop<SimpleWorkflowState>(name: "foo", steps: baseStepList);
+            var forLoop = new WhileLoop<SimpleWorkflowState>(shouldContinue: state => false, name: "foo", steps: baseStepList);
             
             // Act
             var result = await forLoop.Execute(_workflowState);

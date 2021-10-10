@@ -13,6 +13,7 @@
     <Version>0.0.14</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

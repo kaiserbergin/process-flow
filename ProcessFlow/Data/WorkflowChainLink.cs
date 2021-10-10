@@ -5,28 +5,38 @@ using Newtonsoft.Json;
 
 namespace ProcessFlow.Data
 {
-    public class WorkflowChainLink
+    public sealed class WorkflowChainLink
     {
-        public string StepName { get; set; }
-        public string StepIdentifier { get; set; }
-        public int SequenceNumber { get; set; }
-        public List<StepActivity> StepActivities { get; set; } = new List<StepActivity>();
-        private byte[] StateSnapshot;
+        private byte[]? _stateSnapshot;
 
-        public void SetStateSnapshot(object obj)
+        internal WorkflowChainLink(
+            string stepName,
+            string stepIdentifier,
+            int sequenceNumber,
+            StepActivity stepActivity
+        )
+        {
+            StepName = stepName;
+            StepIdentifier = stepIdentifier;
+            SequenceNumber = sequenceNumber;
+            StepActivities.Add(stepActivity);
+        }
+
+        public string StepName { get; }
+        public string StepIdentifier { get; }
+        public int SequenceNumber { get; }
+        public List<StepActivity> StepActivities { get; set; } = new List<StepActivity>();
+
+        public void SetStateSnapshot(object? obj)
         {
             if (obj != null)
-                StateSnapshot = obj.Zippify();
+                _stateSnapshot = obj.Zippify();
         }
 
-        public T GetUncompressedStateSnapshot<T>() where T : class
-        {
-            if (StateSnapshot == null)
-                return null;
-            return StateSnapshot.Unzippify<T>();
-        }
+        public T? GetUncompressedStateSnapshot<T>() where T : class =>
+            _stateSnapshot?.Unzippify<T>();
 
-        public byte[] GetCompressedStateSnapshot() => StateSnapshot;
+        public byte[]? GetCompressedStateSnapshot() => _stateSnapshot;
 
         public override bool Equals(object obj)
         {
@@ -35,12 +45,16 @@ namespace ProcessFlow.Data
                    StepIdentifier == link.StepIdentifier &&
                    SequenceNumber == link.SequenceNumber &&
                    EqualityComparer<List<StepActivity>>.Default.Equals(StepActivities, link.StepActivities) &&
-                   EqualityComparer<byte[]>.Default.Equals(StateSnapshot, link.StateSnapshot);
+                   (
+                       _stateSnapshot == null && link._stateSnapshot == null ||
+                       _stateSnapshot != null && link._stateSnapshot != null &&
+                       EqualityComparer<byte[]>.Default.Equals(_stateSnapshot, link._stateSnapshot)
+                   );
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(StepName, StepIdentifier, SequenceNumber, StepActivities, StateSnapshot);
+            return HashCode.Combine(StepName, StepIdentifier, SequenceNumber, StepActivities, _stateSnapshot);
         }
 
         public override string ToString() =>

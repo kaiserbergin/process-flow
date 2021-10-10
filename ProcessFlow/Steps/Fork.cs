@@ -9,17 +9,17 @@ namespace ProcessFlow.Steps
     {
         private List<Step<T>> _steps;
 
-        public Fork(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        public Fork(string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
         {
             _steps = new List<Step<T>>();
         }
 
-        public Fork(List<Step<T>> steps, string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        public Fork(List<Step<T>> steps, string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
         {
             _steps = steps;
         }
 
-        public Fork(string name = null, StepSettings stepSettings = null, params Step<T>[] steps) : base(name, stepSettings)
+        public Fork(string? name = null, StepSettings? stepSettings = null, params Step<T>[] steps) : base(name, stepSettings)
         {
             _steps = steps.ToList();
         }
@@ -55,6 +55,6 @@ namespace ProcessFlow.Steps
             return workflowState;
         }
 
-        protected override Task<T> Process(T state) => Task.FromResult(state);
+        protected override Task<T?> Process(T? state) => Task.FromResult(state);
     }
 }

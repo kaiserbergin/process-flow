@@ -8,29 +8,29 @@ namespace ProcessFlow.Steps.Loops
 {
     public sealed class WhileLoop<T> : Loop<T> where T : class
     {
-        private Func<T, bool> _shouldContinue;
-        private Func<T, Task<bool>> _shouldContinueAsync;
+        private readonly Func<T?, bool>? _shouldContinue;
+        private readonly Func<T?, Task<bool>>? _shouldContinueAsync;
 
-        public WhileLoop(string name = null, StepSettings stepSettings = null, List<Step<T>> steps = null) : base(name, stepSettings, steps) { }
+        public WhileLoop(string? name = null, StepSettings? stepSettings = null, List<Step<T>>? steps = null) : base(name, stepSettings, steps) { }
         public WhileLoop(
-            Func<T, bool> shouldContinue,
-            string name = null,
-            StepSettings stepSettings = null,
-            List<Step<T>> steps = null) : base(name, stepSettings, steps)
+            Func<T?, bool> shouldContinue,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _shouldContinue = shouldContinue;
         }
 
         public WhileLoop(
-            Func<T, Task<bool>> shouldContinueAsync,
-            string name = null,
-            StepSettings stepSettings = null,
-            List<Step<T>> steps = null) : base(name, stepSettings, steps)
+            Func<T?, Task<bool>> shouldContinueAsync,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _shouldContinueAsync = shouldContinueAsync;
         }
 
-        protected override Task<T> Process(T state) => Task.FromResult(state);
+        protected override Task<T?> Process(T? state) => Task.FromResult(state);
 
         protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState)
         {
@@ -56,7 +56,7 @@ namespace ProcessFlow.Steps.Loops
             return workflowState;
         }
 
-        private async Task<bool> ShouldContinue(T state)
+        private async Task<bool> ShouldContinue(T? state)
         {
             if (_shouldContinue != null)
                 return _shouldContinue(state);

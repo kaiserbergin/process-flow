@@ -8,7 +8,7 @@ namespace ProcessFlow.Steps.Loops
         private int _currentIteration = 0;
         public int CurrentIteration => _currentIteration;
         
-        public LoopStep(string name = null, StepSettings stepSettings = null, IClock clock = null)
+        public LoopStep(string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
             : base(name, stepSettings, clock) { }
         
         protected void Break() => throw new BreakException();

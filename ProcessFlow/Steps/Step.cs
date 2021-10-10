@@ -1,7 +1,6 @@
 ﻿using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
@@ -11,13 +10,13 @@ namespace ProcessFlow.Steps
         public string Name { get; private set; }
         public string Id { get; private set; }
 
-        private Step<TState> _next;
-        private Step<TState> _previous;
+        private Step<TState>? _next;
+        private Step<TState>? _previous;
 
-        private StepSettings _stepSettings;
+        private StepSettings? _stepSettings;
         private IClock _clock;
 
-        public Step(string name = null, StepSettings stepSettings = null, IClock clock = null)
+        public Step(string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
         {
             Name = name ?? GetType().Name;
             Id = Guid.NewGuid().ToString("N");
@@ -25,12 +24,12 @@ namespace ProcessFlow.Steps
             _clock = clock ?? new Clock();
         }
 
-        public Step<TState> Next()
+        public Step<TState>? Next()
         {
             return _next;
         }
 
-        public Step<TState> Previous()
+        public Step<TState>? Previous()
         {
             return _previous;
         }
@@ -43,7 +42,7 @@ namespace ProcessFlow.Steps
             {
                 workflowState.State = await Process(workflowState.State);
 
-                if (_stepSettings?.TrackStateChanges ?? false) TakeDataSnapShot(workflowState, currentLink);
+                if (_stepSettings?.TrackStateChanges ?? workflowState.DefaultStepSettings?.TrackStateChanges ?? false) TakeDataSnapShot(workflowState, currentLink);
 
                 await ExecuteExtensionProcess(workflowState);
                 
@@ -63,7 +62,7 @@ namespace ProcessFlow.Steps
                 throw new WorkflowActionException<TState>("Exception in Process Flow execution. See InnerException for details.", exception, workflowState);
             }
 
-            if (_stepSettings?.AutoProgress ?? false)
+            if (_stepSettings?.AutoProgress ?? workflowState.DefaultStepSettings?.AutoProgress ?? false)
                 return await ExecuteNext(workflowState);
 
             return workflowState;
@@ -71,7 +70,7 @@ namespace ProcessFlow.Steps
 
         public void Terminate() => throw new TerminateWorkflowException();
 
-        protected abstract Task<TState> Process(TState state);
+        protected abstract Task<TState?> Process(TState? state);
 
         protected virtual Task<WorkflowState<TState>> ExecuteExtensionProcess(WorkflowState<TState> workflowState) => Task.FromResult(workflowState);
 
@@ -80,14 +79,13 @@ namespace ProcessFlow.Steps
             var chain = workflowState.WorkflowChain;
             var previousLink = chain.Last;
 
-            var link = new WorkflowChainLink()
-            {
-                StepName = Name,
-                StepIdentifier = Id,
-                SequenceNumber = previousLink?.Value?.SequenceNumber + 1 ?? 0,
-                StepActivities = new List<StepActivity> { new StepActivity(StepActivityStages.Executing, _clock.UtcNow()) }
-            };
-
+            var link = new WorkflowChainLink(
+                stepName: Name,
+                stepIdentifier: Id,
+                sequenceNumber: previousLink?.Value?.SequenceNumber + 1 ?? 0,
+                stepActivity: new StepActivity(StepActivityStages.Executing, _clock.UtcNow())
+            );
+            
             chain.AddLast(link);
 
             return link;
