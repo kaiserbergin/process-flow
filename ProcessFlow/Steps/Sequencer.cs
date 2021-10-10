@@ -8,7 +8,7 @@ namespace ProcessFlow.Steps
     {
         private List<Step<T>> _sequence;
 
-        public Sequencer(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        public Sequencer(string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
         {
             _sequence = new List<Step<T>>();
         }
@@ -40,6 +40,6 @@ namespace ProcessFlow.Steps
             return workflowState;
         }
 
-        protected override Task<T> Process(T state) => Task.FromResult(state);
+        protected override Task<T?> Process(T? state) => Task.FromResult(state);
     }
 }

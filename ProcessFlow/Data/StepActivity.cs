@@ -4,10 +4,10 @@ namespace ProcessFlow.Data
 {
     public readonly struct StepActivity
     {
-        public StepActivity(StepActivityStages activity, DateTimeOffset? dateTimeOffset = null, IClock clock = null)
+        public StepActivity(StepActivityStages activity, DateTimeOffset? dateTimeOffset = null, IClock? clock = null)
         {
             Activity = activity;
-            clock = clock ?? new Clock();
+            clock ??= new Clock();
             DateTimeOffset = dateTimeOffset.HasValue ? dateTimeOffset.Value : clock.UtcNow();
         }
 

@@ -7,7 +7,7 @@ namespace ProcessFlow.Steps
     public abstract class SingleStepSelector<T> : Step<T> where T : class
     {
         private List<Step<T>> _options;
-        public SingleStepSelector(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
+        public SingleStepSelector(string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
         {
             _options = new List<Step<T>>();
         }
@@ -30,7 +30,7 @@ namespace ProcessFlow.Steps
             return workflowState;
         }
 
-        protected override Task<T> Process(T state)
+        protected override Task<T?> Process(T? state)
         {
             return Task.FromResult(state);
         }

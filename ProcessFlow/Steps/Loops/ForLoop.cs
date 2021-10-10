@@ -8,38 +8,38 @@ namespace ProcessFlow.Steps.Loops
 {
     public sealed class ForLoop<T> : Loop<T> where T : class
     {
-        private int _iterationCount = 0;
-        private Func<T, int> _setIterationCount;
-        private Func<T, Task<int>> _setIterationCountAsync;
+        private int _iterationCount;
+        private readonly Func<T?, int>? _setIterationCount;
+        private readonly Func<T?, Task<int>>? _setIterationCountAsync;
 
         public ForLoop(
             int iterations,
-            string name = null,
-            StepSettings stepSettings = null,
-            List<Step<T>> steps = null) : base(name, stepSettings, steps)
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _iterationCount = iterations;
         }
         
         public ForLoop(
-            Func<T, int> setIterationCount,
-            string name = null,
-            StepSettings stepSettings = null,
-            List<Step<T>> steps = null) : base(name, stepSettings, steps)
+            Func<T?, int> setIterationCount,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _setIterationCount = setIterationCount;
         }
 
         public ForLoop(
-            Func<T, Task<int>> setIterationCountAsync,
-            string name = null,
-            StepSettings stepSettings = null,
-            List<Step<T>> steps = null) : base(name, stepSettings, steps)
+            Func<T?, Task<int>> setIterationCountAsync,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _setIterationCountAsync = setIterationCountAsync;
         }
 
-        protected override async Task<T> Process(T state)
+        protected override async Task<T?> Process(T? state)
         {
             if (_setIterationCount != null)
                 _iterationCount = _setIterationCount(state);

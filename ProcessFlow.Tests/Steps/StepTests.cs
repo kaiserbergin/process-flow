@@ -179,5 +179,81 @@ namespace ProcessFlow.Tests.Steps
             Assert.Equal(StepActivityStages.Executing, secondLink.StepActivities.First().Activity);
             Assert.Equal(StepActivityStages.ExecutionCompleted, secondLink.StepActivities.Last().Activity);
         }
+        
+        [Fact]
+        public async void DefaultStepSettings()
+        {
+            // Arrange
+            var workflowState = new WorkflowState<SimpleWorkflowState> { State = new SimpleWorkflowState(), DefaultStepSettings = new StepSettings { AutoProgress = true, TrackStateChanges = true }};
+            var originalWorkflowState = workflowState.State.DeepCopy();
+            
+            var baseStepName = "base"; 
+            var nextStepName = "next";
+
+            var originStep = new BaseStep(name: baseStepName); 
+            var nextStep = new BaseStep(name: nextStepName);
+            
+            originStep.SetNext(nextStep);
+
+            // Act
+            var result = await originStep.Execute(workflowState);
+
+            // Assert
+            Assert.Equal(originalWorkflowState.MyInteger + 2, result.State.MyInteger);
+            Assert.Equal(2, result.WorkflowChain.Count);
+
+            var firstLink = result.WorkflowChain.First.Value;
+            var secondLink = result.WorkflowChain.Last.Value;
+
+            Assert.Equal(originStep.Id, firstLink.StepIdentifier);
+            Assert.Equal(1, firstLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
+            Assert.Equal(nextStep.Id, secondLink.StepIdentifier);
+            Assert.Equal(2, secondLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
+
+            Assert.Equal(StepActivityStages.Executing, firstLink.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionCompleted, firstLink.StepActivities.Last().Activity);
+
+            Assert.Equal(StepActivityStages.Executing, secondLink.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionCompleted, secondLink.StepActivities.Last().Activity);
+        }
+        
+        [Fact]
+        public async void DefaultStepSettings_OverridenByStep()
+        {
+            // Arrange
+            var workflowState = new WorkflowState<SimpleWorkflowState> { State = new SimpleWorkflowState(), DefaultStepSettings = new StepSettings { AutoProgress = true, TrackStateChanges = true }};
+            var originalWorkflowState = workflowState.State.DeepCopy();
+            
+            var baseStepName = "base"; 
+            var nextStepName = "next";
+            var unreachableStepName = "nope";
+
+            var originStep = new BaseStep(name: baseStepName); 
+            var nextStep = new BaseStep(name: nextStepName, stepSettings: new StepSettings { AutoProgress = false, TrackStateChanges = true});
+            var unreachableStep = new BaseStep(name: unreachableStepName);
+            
+            originStep.SetNext(nextStep);
+
+            // Act
+            var result = await originStep.Execute(workflowState);
+
+            // Assert
+            Assert.Equal(originalWorkflowState.MyInteger + 2, result.State.MyInteger);
+            Assert.Equal(2, result.WorkflowChain.Count);
+
+            var firstLink = result.WorkflowChain.First.Value;
+            var secondLink = result.WorkflowChain.Last.Value;
+
+            Assert.Equal(originStep.Id, firstLink.StepIdentifier);
+            Assert.Equal(1, firstLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
+            Assert.Equal(nextStep.Id, secondLink.StepIdentifier);
+            Assert.Equal(2, secondLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
+
+            Assert.Equal(StepActivityStages.Executing, firstLink.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionCompleted, firstLink.StepActivities.Last().Activity);
+
+            Assert.Equal(StepActivityStages.Executing, secondLink.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionCompleted, secondLink.StepActivities.Last().Activity);
+        }
     }
 }
