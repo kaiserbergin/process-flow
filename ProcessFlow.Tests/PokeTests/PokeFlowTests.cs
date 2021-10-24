@@ -47,7 +47,7 @@ namespace ProcessFlow.Tests.PokeTests
             releaseEamAllStep.Fork(name: "someName", stepSettings: settings, walkStep, chewGumStep);
 
             // Actssert
-            await findPokemonStep.Execute(new WorkflowState<PokeState> { State = pokeState });
+            await findPokemonStep.ExecuteAsync(new WorkflowState<PokeState> { State = pokeState });
         }
     }
 }

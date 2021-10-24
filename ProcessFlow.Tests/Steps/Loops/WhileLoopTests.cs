@@ -62,7 +62,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var forLoop = new WhileLoop<SimpleWorkflowState>(ShouldContinue, name: "foo", steps: baseStepList);
             
             // Act
-            var result = await forLoop.Execute(_workflowState);
+            var result = await forLoop.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(iterations * baseStepList.Count, result.State.MyInteger);
@@ -88,7 +88,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var forLoop = new WhileLoop<SimpleWorkflowState>(ShouldContinueAsync, name: "foo", steps: baseStepList);
             
             // Act
-            var result = await forLoop.Execute(_workflowState);
+            var result = await forLoop.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(iterations * baseStepList.Count, result.State.MyInteger);
@@ -109,7 +109,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var forLoop = new WhileLoop<SimpleWorkflowState>(shouldContinue: state => true, name: "foo", steps: baseStepList);
             
             // Act
-            var result = await forLoop.Execute(_workflowState);
+            var result = await forLoop.ExecuteAsync(_workflowState);
             var nonBreakStepCount = baseStepList.Count(x => x.GetType() != breakStep.GetType());
 
             // Assert
@@ -136,7 +136,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var forLoop = new WhileLoop<SimpleWorkflowState>(ShouldContinue, name: "foo", steps: baseStepList);
             
             // Act
-            var result = await forLoop.Execute(_workflowState);
+            var result = await forLoop.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(iterations * nonControlStepCount, result.State.MyInteger);

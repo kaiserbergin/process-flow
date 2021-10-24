@@ -14,7 +14,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<Step<PokeState>> Select(List<Step<PokeState>> options, WorkflowState<PokeState> workflowState, CancellationToken cancellationToken)
+        protected override Task<Step<PokeState>> SelectAsync(List<Step<PokeState>> options, WorkflowState<PokeState> workflowState, CancellationToken cancellationToken)
         {
             var pokeState = workflowState.State;
 

@@ -22,14 +22,14 @@ namespace ProcessFlow.Steps.Loops
         public void AddStep(Step<T> step) => _steps.Add(step);
         public void ClearSteps() => _steps = new List<Step<T>>();
         
-        protected async Task Iterate(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected async Task IterateAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             foreach (var step in _steps)
             {
                 if (step is LoopStep<T> loopStep)
                     loopStep.SetIteration(_currentIteration);
 
-                await step.Execute(workflowState, cancellationToken);
+                await step.ExecuteAsync(workflowState, cancellationToken);
             }
         }
     }

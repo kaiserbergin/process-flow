@@ -13,7 +13,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<PokeState> Process(PokeState state, CancellationToken cancellationToken)
+        protected override Task<PokeState> ProcessAsync(PokeState state, CancellationToken cancellationToken)
         {
             if (state.PokeBallCount == 0 || state.EncounteredMon == null)
                 Break();

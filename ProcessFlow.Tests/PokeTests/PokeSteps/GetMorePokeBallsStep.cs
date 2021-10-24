@@ -12,7 +12,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<PokeState> Process(PokeState state, CancellationToken cancellationToken)
+        protected override Task<PokeState> ProcessAsync(PokeState state, CancellationToken cancellationToken)
         {
             state.PokeBallCount = new Bogus.Randomizer().Number(6, 26);
             

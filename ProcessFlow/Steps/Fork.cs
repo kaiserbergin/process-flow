@@ -42,13 +42,13 @@ namespace ProcessFlow.Steps
             return this;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             var taskList = new List<Task>();
 
             foreach (var process in _steps)
             {
-                taskList.Add(process.Execute(workflowState, cancellationToken));
+                taskList.Add(process.ExecuteAsync(workflowState, cancellationToken));
             }
 
             await Task.WhenAll(taskList);
@@ -56,6 +56,6 @@ namespace ProcessFlow.Steps
             return workflowState;
         }
 
-        protected override Task<T?> Process(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
+        protected override Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
     }
 }

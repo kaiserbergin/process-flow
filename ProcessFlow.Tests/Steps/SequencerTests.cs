@@ -38,7 +38,7 @@ namespace ProcessFlow.Tests.Steps
             var expectedSequence = new List<Step<SimpleWorkflowState>> { firstStep, secondStep };
 
             // Act
-            var result = await sequencer.Execute(_workflowState);
+            var result = await sequencer.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(_originalWorfklowState.MyInteger + 2, result.State.MyInteger);
@@ -77,7 +77,7 @@ namespace ProcessFlow.Tests.Steps
             sequencer.SetSequence(expectedSequence);
 
             // Act
-            var result = await sequencer.Execute(_workflowState);
+            var result = await sequencer.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(_originalWorfklowState.MyInteger + 2, result.State.MyInteger);

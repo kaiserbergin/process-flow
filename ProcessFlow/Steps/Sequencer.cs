@@ -31,16 +31,16 @@ namespace ProcessFlow.Steps
             return this;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             foreach (var process in _sequence)
             {
-                workflowState = await process.Execute(workflowState, cancellationToken);
+                workflowState = await process.ExecuteAsync(workflowState, cancellationToken);
             }
 
             return workflowState;
         }
 
-        protected override Task<T?> Process(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
+        protected override Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
     }
 }
