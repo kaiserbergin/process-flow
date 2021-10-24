@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
@@ -94,7 +95,7 @@ namespace ProcessFlow.Tests.Steps.Loops
         {
             // Arrange
             const int iterations = 2;
-            Task<int> DetermineIterations(SimpleWorkflowState simpleWorkflowState) => Task.FromResult(iterations);
+            Task<int> DetermineIterations(SimpleWorkflowState simpleWorkflowState, CancellationToken cancellationToken) => Task.FromResult(iterations);
 
             var step1 = new LoopStep("one");
             var step2 = new LoopStep("two");

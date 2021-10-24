@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
@@ -10,7 +11,7 @@ namespace ProcessFlow.Steps.Loops
     {
         private int _iterationCount;
         private readonly Func<T?, int>? _setIterationCount;
-        private readonly Func<T?, Task<int>>? _setIterationCountAsync;
+        private readonly Func<T?, CancellationToken, Task<int>>? _setIterationCountAsync;
 
         public ForLoop(
             int iterations,
@@ -31,7 +32,7 @@ namespace ProcessFlow.Steps.Loops
         }
 
         public ForLoop(
-            Func<T?, Task<int>> setIterationCountAsync,
+            Func<T?, CancellationToken, Task<int>> setIterationCountAsync,
             string? name = null,
             StepSettings? stepSettings = null,
             List<Step<T>>? steps = null) : base(name, stepSettings, steps)
@@ -39,23 +40,23 @@ namespace ProcessFlow.Steps.Loops
             _setIterationCountAsync = setIterationCountAsync;
         }
 
-        protected override async Task<T?> Process(T? state)
+        protected override async Task<T?> Process(T? state, CancellationToken cancellationToken)
         {
             if (_setIterationCount != null)
                 _iterationCount = _setIterationCount(state);
             else if (_setIterationCountAsync != null)
-                _iterationCount = await _setIterationCountAsync(state).ConfigureAwait(false);
+                _iterationCount = await _setIterationCountAsync(state, cancellationToken).ConfigureAwait(false);
 
             return state;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState)
+        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             for (var i = 0; i < _iterationCount; i++)
             {
                 try
                 {
-                    await Iterate(workflowState);
+                    await Iterate(workflowState, cancellationToken);
                 }
                 catch (ContinueException)
                 {

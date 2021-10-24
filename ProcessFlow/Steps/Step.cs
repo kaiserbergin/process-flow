@@ -1,6 +1,7 @@
 ﻿using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
@@ -34,17 +35,17 @@ namespace ProcessFlow.Steps
             return _previous;
         }
 
-        public async Task<WorkflowState<TState>> Execute(WorkflowState<TState> workflowState)
+        public async Task<WorkflowState<TState>> Execute(WorkflowState<TState> workflowState, CancellationToken cancellationToken = default)
         {
             var currentLink = CreateWorkflowChainLink(workflowState);
 
             try
             {
-                workflowState.State = await Process(workflowState.State);
+                workflowState.State = await Process(workflowState.State, cancellationToken);
 
                 if (_stepSettings?.TrackStateChanges ?? workflowState.DefaultStepSettings?.TrackStateChanges ?? false) TakeDataSnapShot(workflowState, currentLink);
 
-                await ExecuteExtensionProcess(workflowState);
+                await ExecuteExtensionProcess(workflowState, cancellationToken);
                 
                 AddActivityToWorkflowChainLink(StepActivityStages.ExecutionCompleted, currentLink);
             }
@@ -63,16 +64,16 @@ namespace ProcessFlow.Steps
             }
 
             if (_stepSettings?.AutoProgress ?? workflowState.DefaultStepSettings?.AutoProgress ?? false)
-                return await ExecuteNext(workflowState);
+                return await ExecuteNext(workflowState, cancellationToken);
 
             return workflowState;
         }
 
         public void Terminate() => throw new TerminateWorkflowException();
 
-        protected abstract Task<TState?> Process(TState? state);
+        protected abstract Task<TState?> Process(TState? state, CancellationToken cancellationToken);
 
-        protected virtual Task<WorkflowState<TState>> ExecuteExtensionProcess(WorkflowState<TState> workflowState) => Task.FromResult(workflowState);
+        protected virtual Task<WorkflowState<TState>> ExecuteExtensionProcess(WorkflowState<TState> workflowState, CancellationToken cancellationToken) => Task.FromResult(workflowState);
 
         private WorkflowChainLink CreateWorkflowChainLink(WorkflowState<TState> workflowState)
         {
@@ -98,10 +99,10 @@ namespace ProcessFlow.Steps
             link.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));
 
 
-        protected async Task<WorkflowState<TState>> ExecuteNext(WorkflowState<TState> workflowState)
+        protected async Task<WorkflowState<TState>> ExecuteNext(WorkflowState<TState> workflowState, CancellationToken cancellationToken)
         {
             if (_next != null)
-                return await _next.Execute(workflowState);
+                return await _next.Execute(workflowState, cancellationToken);
             else
                 return workflowState;
         }

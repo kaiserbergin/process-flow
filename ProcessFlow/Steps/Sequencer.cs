@@ -1,5 +1,6 @@
 ﻿using ProcessFlow.Data;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
@@ -30,16 +31,16 @@ namespace ProcessFlow.Steps
             return this;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState)
+        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             foreach (var process in _sequence)
             {
-                workflowState = await process.Execute(workflowState);
+                workflowState = await process.Execute(workflowState, cancellationToken);
             }
 
             return workflowState;
         }
 
-        protected override Task<T?> Process(T? state) => Task.FromResult(state);
+        protected override Task<T?> Process(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
     }
 }

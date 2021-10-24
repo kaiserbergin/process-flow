@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
@@ -11,7 +12,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<PokeState> Process(PokeState state)
+        protected override Task<PokeState> Process(PokeState state, CancellationToken cancellationToken)
         {
             for (int i = state.MyPokemon.Count - 1; i >= 0; i--)
             {

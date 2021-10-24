@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
@@ -81,7 +82,8 @@ namespace ProcessFlow.Tests.Steps.Loops
 
             var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
             
-            Task<bool> ShouldContinueAsync(SimpleWorkflowState simpleWorkflowState) => Task.FromResult(simpleWorkflowState.MyInteger < iterations * baseStepList.Count);
+            Task<bool> ShouldContinueAsync(SimpleWorkflowState simpleWorkflowState, CancellationToken cancellationToken) => 
+                Task.FromResult(simpleWorkflowState.MyInteger < iterations * baseStepList.Count);
             
             var forLoop = new WhileLoop<SimpleWorkflowState>(ShouldContinueAsync, name: "foo", steps: baseStepList);
             
