@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
@@ -13,7 +14,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<Step<PokeState>> Select(List<Step<PokeState>> options, WorkflowState<PokeState> workflowState)
+        protected override Task<Step<PokeState>> Select(List<Step<PokeState>> options, WorkflowState<PokeState> workflowState, CancellationToken cancellationToken = default)
         {
             var pokeState = workflowState.State;
 

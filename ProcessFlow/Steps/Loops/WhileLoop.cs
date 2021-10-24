@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
@@ -30,15 +31,15 @@ namespace ProcessFlow.Steps.Loops
             _shouldContinueAsync = shouldContinueAsync;
         }
 
-        protected override Task<T?> Process(T? state) => Task.FromResult(state);
+        protected override Task<T?> Process(T? state, CancellationToken cancellationToken = default) => Task.FromResult(state);
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState)
+        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             while (await ShouldContinue(workflowState.State))
             {
                 try
                 {
-                    await Iterate(workflowState);
+                    await Iterate(workflowState, cancellationToken);
                 }
                 catch (ContinueException)
                 {
