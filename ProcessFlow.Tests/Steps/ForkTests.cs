@@ -44,7 +44,7 @@ namespace ProcessFlow.Tests.Steps
             var expectedExecutionCompletionOrder = new[] { firstStepName, thirdStepName, fourthStepName, secondStepName, forkStepName };
 
             // Act
-            var result = await firstBaseStep.Execute(_workflowState);
+            var result = await firstBaseStep.ExecuteAsync(_workflowState);
 
             var orderedByStarted = result.WorkflowChain.ToList().Select(x => x.StepName).ToArray();
             var orderedByCompletion = result.WorkflowChain.ToList()
@@ -88,7 +88,7 @@ namespace ProcessFlow.Tests.Steps
             // Actssert
             try
             {
-                await firstBaseStep.Execute(_workflowState);
+                await firstBaseStep.ExecuteAsync(_workflowState);
             }
             catch (WorkflowActionException<SimpleWorkflowState> ex)
             {

@@ -40,7 +40,7 @@ namespace ProcessFlow.Steps.Loops
             _setIterationCountAsync = setIterationCountAsync;
         }
 
-        protected override async Task<T?> Process(T? state, CancellationToken cancellationToken)
+        protected override async Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken)
         {
             if (_setIterationCount != null)
                 _iterationCount = _setIterationCount(state);
@@ -50,13 +50,13 @@ namespace ProcessFlow.Steps.Loops
             return state;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             for (var i = 0; i < _iterationCount; i++)
             {
                 try
                 {
-                    await Iterate(workflowState, cancellationToken);
+                    await IterateAsync(workflowState, cancellationToken);
                 }
                 catch (ContinueException)
                 {

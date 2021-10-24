@@ -28,7 +28,7 @@ namespace ProcessFlow.Tests.Steps
             selector.SetOptions(options);
 
             // Act
-            var result = await selector.Execute(_workflowState);
+            var result = await selector.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(2, result.WorkflowChain.Count);

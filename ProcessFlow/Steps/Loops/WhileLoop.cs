@@ -31,15 +31,15 @@ namespace ProcessFlow.Steps.Loops
             _shouldContinueAsync = shouldContinueAsync;
         }
 
-        protected override Task<T?> Process(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
+        protected override Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
-            while (await ShouldContinue(workflowState.State, cancellationToken))
+            while (await ShouldContinueAsync(workflowState.State, cancellationToken))
             {
                 try
                 {
-                    await Iterate(workflowState, cancellationToken);
+                    await IterateAsync(workflowState, cancellationToken);
                 }
                 catch (ContinueException)
                 {
@@ -57,7 +57,7 @@ namespace ProcessFlow.Steps.Loops
             return workflowState;
         }
 
-        private async Task<bool> ShouldContinue(T? state, CancellationToken cancellationToken)
+        private async Task<bool> ShouldContinueAsync(T? state, CancellationToken cancellationToken)
         {
             if (_shouldContinue != null)
                 return _shouldContinue(state);

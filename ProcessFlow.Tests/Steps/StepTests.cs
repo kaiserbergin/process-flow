@@ -26,7 +26,7 @@ namespace ProcessFlow.Tests.Steps
             var stepThatThrowsException = new ExceptionalStep();
 
             // Actsert
-            var exeception = await Assert.ThrowsAsync<WorkflowActionException<SimpleWorkflowState>>(async () => await stepThatThrowsException.Execute(_workflowState));
+            var exeception = await Assert.ThrowsAsync<WorkflowActionException<SimpleWorkflowState>>(async () => await stepThatThrowsException.ExecuteAsync(_workflowState));
 
             Assert.True(exeception.InnerException is NotImplementedException);
             Assert.Equal(_workflowState.ToString(), exeception.WorkflowState.ToString());
@@ -86,7 +86,7 @@ namespace ProcessFlow.Tests.Steps
             var originStep = new BaseStep(name: baseStepName);
 
             // Act
-            var result = await originStep.Execute(_workflowState);
+            var result = await originStep.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(_originalWorfklowState.MyInteger + 1, result.State.MyInteger);
@@ -101,7 +101,7 @@ namespace ProcessFlow.Tests.Steps
             var originStep = new BaseStep(name: baseStepName, settings);
 
             // Act
-            var result = await originStep.Execute(_workflowState);
+            var result = await originStep.ExecuteAsync(_workflowState);
             var link = result.WorkflowChain.First.Value; 
 
             // Assert
@@ -122,7 +122,7 @@ namespace ProcessFlow.Tests.Steps
             var originStep = new BaseStep(name: baseStepName);
 
             // Act
-            var result = await originStep.Execute(_workflowState);
+            var result = await originStep.ExecuteAsync(_workflowState);
             var link = result.WorkflowChain.First.Value;
 
             // Assert
@@ -159,7 +159,7 @@ namespace ProcessFlow.Tests.Steps
             originStep.SetNext(nextStep);
 
             // Act
-            var result = await originStep.Execute(_workflowState);
+            var result = await originStep.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(_originalWorfklowState.MyInteger + 2, result.State.MyInteger);
@@ -196,7 +196,7 @@ namespace ProcessFlow.Tests.Steps
             originStep.SetNext(nextStep);
 
             // Act
-            var result = await originStep.Execute(workflowState);
+            var result = await originStep.ExecuteAsync(workflowState);
 
             // Assert
             Assert.Equal(originalWorkflowState.MyInteger + 2, result.State.MyInteger);
@@ -235,7 +235,7 @@ namespace ProcessFlow.Tests.Steps
             originStep.SetNext(nextStep);
 
             // Act
-            var result = await originStep.Execute(workflowState);
+            var result = await originStep.ExecuteAsync(workflowState);
 
             // Assert
             Assert.Equal(originalWorkflowState.MyInteger + 2, result.State.MyInteger);
