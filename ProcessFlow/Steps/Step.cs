@@ -71,7 +71,7 @@ namespace ProcessFlow.Steps
 
         public void Terminate() => throw new TerminateWorkflowException();
 
-        protected abstract Task<TState?> Process(TState? state, CancellationToken cancellationToken = default);
+        protected abstract Task<TState?> Process(TState? state, CancellationToken cancellationToken);
 
         protected virtual Task<WorkflowState<TState>> ExecuteExtensionProcess(WorkflowState<TState> workflowState, CancellationToken cancellationToken) => Task.FromResult(workflowState);
 

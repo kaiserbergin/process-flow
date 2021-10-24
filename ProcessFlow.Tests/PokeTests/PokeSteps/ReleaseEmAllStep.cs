@@ -12,7 +12,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<PokeState> Process(PokeState state, CancellationToken cancellationToken = default)
+        protected override Task<PokeState> Process(PokeState state, CancellationToken cancellationToken)
         {
             for (int i = state.MyPokemon.Count - 1; i >= 0; i--)
             {

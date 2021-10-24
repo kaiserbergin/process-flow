@@ -13,7 +13,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<PokeState> Process(PokeState state, CancellationToken cancellationToken = default)
+        protected override Task<PokeState> Process(PokeState state, CancellationToken cancellationToken)
         {
             state.EncounteredMon = new Faker<Pokemon>()
                 .StrictMode(false)

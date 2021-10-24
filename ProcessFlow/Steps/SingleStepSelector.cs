@@ -26,16 +26,16 @@ namespace ProcessFlow.Steps
 
         protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
-            var selectedProcessor = await Select(_options, workflowState);
+            var selectedProcessor = await Select(_options, workflowState, cancellationToken);
             await selectedProcessor.Execute(workflowState, cancellationToken);
             return workflowState;
         }
 
-        protected override Task<T?> Process(T? state, CancellationToken cancellationToken = default)
+        protected override Task<T?> Process(T? state, CancellationToken cancellationToken)
         {
             return Task.FromResult(state);
         }
 
-        protected abstract Task<Step<T>> Select(List<Step<T>> options, WorkflowState<T> workflowState, CancellationToken cancellationToken = default);
+        protected abstract Task<Step<T>> Select(List<Step<T>> options, WorkflowState<T> workflowState, CancellationToken cancellationToken);
     }
 }

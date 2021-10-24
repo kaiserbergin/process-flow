@@ -56,6 +56,6 @@ namespace ProcessFlow.Steps
             return workflowState;
         }
 
-        protected override Task<T?> Process(T? state, CancellationToken cancellationToken = default) => Task.FromResult(state);
+        protected override Task<T?> Process(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
     }
 }

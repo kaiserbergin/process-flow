@@ -40,7 +40,7 @@ namespace ProcessFlow.Steps.Loops
             _setIterationCountAsync = setIterationCountAsync;
         }
 
-        protected override async Task<T?> Process(T? state, CancellationToken cancellationToken = default)
+        protected override async Task<T?> Process(T? state, CancellationToken cancellationToken)
         {
             if (_setIterationCount != null)
                 _iterationCount = _setIterationCount(state);
