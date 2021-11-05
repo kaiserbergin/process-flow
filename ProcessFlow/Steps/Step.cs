@@ -1,6 +1,7 @@
 ﻿using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -69,6 +70,7 @@ namespace ProcessFlow.Steps
             return workflowState;
         }
 
+        [DoesNotReturn]
         public void Terminate() => throw new TerminateWorkflowException();
 
         protected abstract Task<TState?> ProcessAsync(TState? state, CancellationToken cancellationToken);
