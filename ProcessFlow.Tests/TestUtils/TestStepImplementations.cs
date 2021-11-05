@@ -13,7 +13,7 @@ namespace ProcessFlow.Tests.TestUtils
     {
     }
 
-    public class ExceptionalStep : Step<SimpleWorkflowState>
+    public class ExceptionalStep : AbstractStep<SimpleWorkflowState>
     {
         public ExceptionalStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
         {
@@ -25,7 +25,7 @@ namespace ProcessFlow.Tests.TestUtils
         }
     }
 
-    public class BaseStep : Step<SimpleWorkflowState>
+    public class BaseStep : AbstractStep<SimpleWorkflowState>
     {
         public BaseStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
         {
@@ -39,7 +39,7 @@ namespace ProcessFlow.Tests.TestUtils
         }
     }
 
-    public class AnotherStepType : Step<SimpleWorkflowState>
+    public class AnotherStepType : AbstractStep<SimpleWorkflowState>
     {
         public AnotherStepType(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
         {
@@ -53,7 +53,7 @@ namespace ProcessFlow.Tests.TestUtils
         }
     }
 
-    public class LoopStep : LoopStep<SimpleWorkflowState>
+    public class LoopStep : AbstractLoopStep<SimpleWorkflowState>
     {
         public LoopStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
         {
@@ -67,7 +67,7 @@ namespace ProcessFlow.Tests.TestUtils
         }
     }
 
-    public class StopThatThrowsBreak : LoopStep<SimpleWorkflowState>
+    public class StopThatThrowsBreak : AbstractLoopStep<SimpleWorkflowState>
     {
         public StopThatThrowsBreak(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
         {
@@ -80,7 +80,7 @@ namespace ProcessFlow.Tests.TestUtils
         }
     }
 
-    public class StepThatThrowsContinue : LoopStep<SimpleWorkflowState>
+    public class StepThatThrowsContinue : AbstractLoopStep<SimpleWorkflowState>
     {
         public StepThatThrowsContinue(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
         {
@@ -95,13 +95,13 @@ namespace ProcessFlow.Tests.TestUtils
 
     public class BaseSelector : SingleStepSelector<SimpleWorkflowState>
     {
-        protected override Task<Step<SimpleWorkflowState>> SelectAsync(List<Step<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState, CancellationToken cancellationToken)
+        protected override Task<AbstractStep<SimpleWorkflowState>> SelectAsync(List<AbstractStep<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState, CancellationToken cancellationToken)
         {
             return Task.FromResult(options.First());
         }
     }
 
-    public class AsyncStep : Step<SimpleWorkflowState>
+    public class AsyncStep : AbstractStep<SimpleWorkflowState>
     {
         private readonly int _delayMs;
 

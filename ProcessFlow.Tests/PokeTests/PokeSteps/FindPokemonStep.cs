@@ -7,7 +7,7 @@ using ProcessFlow.Tests.PokeTests.PokeData;
 
 namespace ProcessFlow.Tests.PokeTests.PokeSteps
 {
-    public class FindPokemonStep : Step<PokeState>
+    public class FindPokemonStep : AbstractStep<PokeState>
     {
         public FindPokemonStep(string name = null, StepSettings stepSettings = null, IClock clock = null) : base(name, stepSettings, clock)
         {

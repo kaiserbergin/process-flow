@@ -27,7 +27,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new BaseStep("two");
             var step3 = new BaseStep("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, step3 };
 
             var whileLoop = new WhileLoop<SimpleWorkflowState>(shouldContinue: state => false);
             
@@ -55,7 +55,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new LoopStep("two");
             var step3 = new LoopStep("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, step3 };
             
             bool ShouldContinue(SimpleWorkflowState simpleWorkflowState) => simpleWorkflowState.MyInteger < iterations * baseStepList.Count;
             
@@ -80,7 +80,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new LoopStep("two");
             var step3 = new LoopStep("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, step3 };
             
             Task<bool> ShouldContinueAsync(SimpleWorkflowState simpleWorkflowState, CancellationToken cancellationToken) => 
                 Task.FromResult(simpleWorkflowState.MyInteger < iterations * baseStepList.Count);
@@ -104,7 +104,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new LoopStep("two");
             var breakStep = new StopThatThrowsBreak("break-step");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, breakStep };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, breakStep };
             
             var forLoop = new WhileLoop<SimpleWorkflowState>(shouldContinue: state => true, name: "foo", steps: baseStepList);
             
@@ -128,7 +128,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new LoopStep("two");
             var controlStop = new StepThatThrowsContinue("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, controlStop };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, controlStop };
             var nonControlStepCount = baseStepList.Count(x => x.GetType() != controlStop.GetType());
             
             bool ShouldContinue(SimpleWorkflowState simpleWorkflowState) => simpleWorkflowState.MyInteger < iterations * nonControlStepCount;

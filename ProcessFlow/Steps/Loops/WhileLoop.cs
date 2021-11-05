@@ -12,12 +12,12 @@ namespace ProcessFlow.Steps.Loops
         private readonly Func<T?, bool>? _shouldContinue;
         private readonly Func<T?, CancellationToken, Task<bool>>? _shouldContinueAsync;
 
-        public WhileLoop(string? name = null, StepSettings? stepSettings = null, List<Step<T>>? steps = null) : base(name, stepSettings, steps) { }
+        public WhileLoop(string? name = null, StepSettings? stepSettings = null, List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps) { }
         public WhileLoop(
             Func<T?, bool> shouldContinue,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
+            List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _shouldContinue = shouldContinue;
         }
@@ -26,7 +26,7 @@ namespace ProcessFlow.Steps.Loops
             Func<T?, CancellationToken, Task<bool>> shouldContinueAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
+            List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _shouldContinueAsync = shouldContinueAsync;
         }

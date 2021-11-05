@@ -35,7 +35,7 @@ namespace ProcessFlow.Tests.Steps
             sequencer.AddStep(firstStep);
             sequencer.AddStep(secondStep);
 
-            var expectedSequence = new List<Step<SimpleWorkflowState>> { firstStep, secondStep };
+            var expectedSequence = new List<AbstractStep<SimpleWorkflowState>> { firstStep, secondStep };
 
             // Act
             var result = await sequencer.ExecuteAsync(_workflowState);
@@ -72,7 +72,7 @@ namespace ProcessFlow.Tests.Steps
             var firstStep = new BaseStep(name: firstStepName, settings);
             var secondStep = new BaseStep(name: secondStepName, settings);
 
-            var expectedSequence = new List<Step<SimpleWorkflowState>> { firstStep, secondStep };
+            var expectedSequence = new List<AbstractStep<SimpleWorkflowState>> { firstStep, secondStep };
 
             sequencer.SetSequence(expectedSequence);
 

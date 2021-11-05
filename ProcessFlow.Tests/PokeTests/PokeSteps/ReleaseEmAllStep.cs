@@ -6,7 +6,7 @@ using ProcessFlow.Tests.PokeTests.PokeData;
 
 namespace ProcessFlow.Tests.PokeTests.PokeSteps
 {
-    public class ReleaseEmAllStep : Step<PokeState>
+    public class ReleaseEmAllStep : AbstractStep<PokeState>
     {
         public ReleaseEmAllStep(string name = null, StepSettings stepSettings = null, IClock clock = null) : base(name, stepSettings, clock)
         {

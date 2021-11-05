@@ -17,7 +17,7 @@ namespace ProcessFlow.Steps.Loops
             int iterations,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
+            List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _iterationCount = iterations;
         }
@@ -26,7 +26,7 @@ namespace ProcessFlow.Steps.Loops
             Func<T?, int> setIterationCount,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
+            List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _setIterationCount = setIterationCount;
         }
@@ -35,7 +35,7 @@ namespace ProcessFlow.Steps.Loops
             Func<T?, CancellationToken, Task<int>> setIterationCountAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
+            List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _setIterationCountAsync = setIterationCountAsync;
         }

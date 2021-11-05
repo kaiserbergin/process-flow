@@ -28,7 +28,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new BaseStep("two");
             var step3 = new BaseStep("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, step3 };
 
             var forLoop = new ForLoop<SimpleWorkflowState>(1);
             
@@ -54,7 +54,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new LoopStep("two");
             var step3 = new LoopStep("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, step3 };
             
             var forLoop = new ForLoop<SimpleWorkflowState>(iterations, name: "foo", steps: baseStepList);
             
@@ -77,7 +77,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new LoopStep("two");
             var step3 = new LoopStep("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, step3 };
             
             var forLoop = new ForLoop<SimpleWorkflowState>((SimpleWorkflowState simpleWorkflowState) => iterations, name: "foo", steps: baseStepList);
             
@@ -101,7 +101,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new LoopStep("two");
             var step3 = new LoopStep("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, step3 };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, step3 };
             
             var forLoop = new ForLoop<SimpleWorkflowState>(DetermineIterations, name: "foo", steps: baseStepList);
             
@@ -124,7 +124,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var step2 = new LoopStep("two");
             var breakStep = new StopThatThrowsBreak("break-step");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, step2, breakStep };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, step2, breakStep };
             
             var forLoop = new ForLoop<SimpleWorkflowState>(iterations, name: "foo", steps: baseStepList);
             
@@ -148,7 +148,7 @@ namespace ProcessFlow.Tests.Steps.Loops
             var continueStep = new StepThatThrowsContinue("break-step");
             var step3 = new LoopStep("three");
 
-            var baseStepList = new List<Step<SimpleWorkflowState>> { step1, continueStep, step3 };
+            var baseStepList = new List<AbstractStep<SimpleWorkflowState>> { step1, continueStep, step3 };
             
             var forLoop = new ForLoop<SimpleWorkflowState>(iterations, name: "foo", steps: baseStepList);
             

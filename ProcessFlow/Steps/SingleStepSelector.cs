@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
 {
-    public abstract class SingleStepSelector<T> : Step<T> where T : class
+    public abstract class SingleStepSelector<T> : AbstractStep<T> where T : class
     {
-        private List<Step<T>> _options;
+        private List<AbstractStep<T>> _options;
         public SingleStepSelector(string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
         {
-            _options = new List<Step<T>>();
+            _options = new List<AbstractStep<T>>();
         }
 
-        public List<Step<T>> Options()
+        public List<AbstractStep<T>> Options()
         {
             return _options;
         }
 
-        public SingleStepSelector<T> SetOptions(List<Step<T>> options)
+        public SingleStepSelector<T> SetOptions(List<AbstractStep<T>> options)
         {
             _options = options;
             return this;
@@ -36,6 +36,6 @@ namespace ProcessFlow.Steps
             return Task.FromResult(state);
         }
 
-        protected abstract Task<Step<T>> SelectAsync(List<Step<T>> options, WorkflowState<T> workflowState, CancellationToken cancellationToken);
+        protected abstract Task<AbstractStep<T>> SelectAsync(List<AbstractStep<T>> options, WorkflowState<T> workflowState, CancellationToken cancellationToken);
     }
 }

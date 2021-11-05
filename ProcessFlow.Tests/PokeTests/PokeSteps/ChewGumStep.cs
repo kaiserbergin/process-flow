@@ -6,7 +6,7 @@ using ProcessFlow.Tests.PokeTests.PokeData;
 
 namespace ProcessFlow.Tests.PokeTests.PokeSteps
 {
-    public class ChewGumStep : Step<PokeState>
+    public class ChewGumStep : AbstractStep<PokeState>
     {
         public ChewGumStep(string name = null, StepSettings stepSettings = null, IClock clock = null) : base(name, stepSettings, clock)
         {

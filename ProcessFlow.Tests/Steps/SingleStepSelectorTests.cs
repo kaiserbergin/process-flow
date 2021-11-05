@@ -24,7 +24,7 @@ namespace ProcessFlow.Tests.Steps
             var selector = new BaseSelector();
             var expectedOption = new BaseStep(name: "expectedOption");
             var option = new BaseStep(name: "option");
-            var options = new List<Step<SimpleWorkflowState>>() { expectedOption, option };
+            var options = new List<AbstractStep<SimpleWorkflowState>>() { expectedOption, option };
             selector.SetOptions(options);
 
             // Act

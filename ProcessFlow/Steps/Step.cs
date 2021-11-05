@@ -1,124 +1,50 @@
-﻿using ProcessFlow.Data;
-using ProcessFlow.Exceptions;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using ProcessFlow.Data;
 
 namespace ProcessFlow.Steps
 {
-    public abstract class Step<TState> where TState : class
+    public sealed class Step<TState> : AbstractStep<TState> where TState : class
     {
-        public string Name { get; private set; }
-        public string Id { get; private set; }
+        private readonly Func<TState?, Action, CancellationToken, Task>? _processActionAsync;
+        private readonly Action<TState?, Action>? _processActionSync;
 
-        private Step<TState>? _next;
-        private Step<TState>? _previous;
-
-        private StepSettings? _stepSettings;
-        private IClock _clock;
-
-        public Step(string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
+        internal Step(Func<TState?, Action, CancellationToken, Task> processActionAsync, string? name = null, StepSettings? stepSettings = null, IClock? clock = null) 
+            : base(name, stepSettings, clock)
         {
-            Name = name ?? GetType().Name;
-            Id = Guid.NewGuid().ToString("N");
-            _stepSettings = stepSettings;
-            _clock = clock ?? new Clock();
+            _processActionAsync = processActionAsync;
         }
-
-        public Step<TState>? Next()
+        
+        internal Step(Action<TState?, Action> processActionSync, string? name = null, StepSettings? stepSettings = null, IClock? clock = null) 
+            : base(name, stepSettings, clock)
         {
-            return _next;
+            _processActionSync = processActionSync;
         }
+        
+        public static IStep<TState> Create(Func<TState?, Task> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null) =>
+            new Step<TState>((state, terminate, cancellationtoken) => processFunc(state), name, stepSettings, clock);
+        
+        public static IStep<TState> Create(Func<TState?, Action, Task> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null) =>
+            new Step<TState>((state, terminate, cancellationtoken) => processFunc(state, terminate), name, stepSettings, clock);
 
-        public Step<TState>? Previous()
+        public static IStep<TState> Create(Func<TState?, Action, CancellationToken, Task> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null) =>
+            new Step<TState>(processFunc, name, stepSettings, clock);
+        
+        public static IStep<TState> Create(Action<TState?> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null) =>
+            new Step<TState>((state, terminate) => processFunc(state), name, stepSettings, clock);
+
+        public static IStep<TState> Create(Action<TState?, Action> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null) =>
+            new Step<TState>(processFunc, name, stepSettings, clock);
+
+        protected override async Task<TState?> ProcessAsync(TState? state, CancellationToken cancellationToken)
         {
-            return _previous;
-        }
-
-        public async Task<WorkflowState<TState>> ExecuteAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken = default)
-        {
-            var currentLink = CreateWorkflowChainLink(workflowState);
-
-            try
-            {
-                workflowState.State = await ProcessAsync(workflowState.State, cancellationToken);
-
-                if (_stepSettings?.TrackStateChanges ?? workflowState.DefaultStepSettings?.TrackStateChanges ?? false) TakeDataSnapShot(workflowState, currentLink);
-
-                await ExecuteExtensionProcessAsync(workflowState, cancellationToken);
-                
-                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionCompleted, currentLink);
-            }
-            catch (LoopJumpException)
-            {
-                throw;
-            }
-            catch (TerminateWorkflowException)
-            {
-                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionTerminated, currentLink);
-            }
-            catch (Exception exception)
-            {
-                AddActivityToWorkflowChainLink(StepActivityStages.ExecutionFailed, currentLink);
-                throw new WorkflowActionException<TState>("Exception in Process Flow execution. See InnerException for details.", exception, workflowState);
-            }
-
-            if (_stepSettings?.AutoProgress ?? workflowState.DefaultStepSettings?.AutoProgress ?? false)
-                return await ExecuteNextAsync(workflowState, cancellationToken);
-
-            return workflowState;
-        }
-
-        [DoesNotReturn]
-        public void Terminate() => throw new TerminateWorkflowException();
-
-        protected abstract Task<TState?> ProcessAsync(TState? state, CancellationToken cancellationToken);
-
-        protected virtual Task<WorkflowState<TState>> ExecuteExtensionProcessAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken) => Task.FromResult(workflowState);
-
-        private WorkflowChainLink CreateWorkflowChainLink(WorkflowState<TState> workflowState)
-        {
-            var chain = workflowState.WorkflowChain;
-            var previousLink = chain.Last;
-
-            var link = new WorkflowChainLink(
-                stepName: Name,
-                stepIdentifier: Id,
-                sequenceNumber: previousLink?.Value?.SequenceNumber + 1 ?? 0,
-                stepActivity: new StepActivity(StepActivityStages.Executing, _clock.UtcNow())
-            );
+            if (_processActionAsync != null)
+                await _processActionAsync(state, Terminate, cancellationToken);
+            if (_processActionSync != null)
+                _processActionSync(state, Terminate);
             
-            chain.AddLast(link);
-
-            return link;
-        }
-
-        private void TakeDataSnapShot(WorkflowState<TState> workflowState, WorkflowChainLink link) =>
-            link.SetStateSnapshot(workflowState.State);
-
-        private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowChainLink link) =>
-            link.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));
-
-
-        protected async Task<WorkflowState<TState>> ExecuteNextAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken)
-        {
-            if (_next != null)
-                return await _next.ExecuteAsync(workflowState, cancellationToken);
-            else
-                return workflowState;
-        }
-
-        public Step<TState> SetNextStep(Step<TState> step)
-        {
-            _next = step;
-            return _next;
-        }
-
-        public Step<TState> SetPreviousStep(Step<TState> step)
-        {
-            _previous = step;
-            return _previous;
+            return state;
         }
     }
 }

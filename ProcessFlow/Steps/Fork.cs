@@ -6,37 +6,37 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
 {
-    public sealed class Fork<T> : Step<T> where T : class
+    public sealed class Fork<T> : AbstractStep<T> where T : class
     {
-        private List<Step<T>> _steps;
+        private List<AbstractStep<T>> _steps;
 
         public Fork(string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
         {
-            _steps = new List<Step<T>>();
+            _steps = new List<AbstractStep<T>>();
         }
 
-        public Fork(List<Step<T>> steps, string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
+        public Fork(List<AbstractStep<T>> steps, string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
         {
             _steps = steps;
         }
 
-        public Fork(string? name = null, StepSettings? stepSettings = null, params Step<T>[] steps) : base(name, stepSettings)
+        public Fork(string? name = null, StepSettings? stepSettings = null, params AbstractStep<T>[] steps) : base(name, stepSettings)
         {
             _steps = steps.ToList();
         }
 
-        public Fork<T> AddStep(Step<T> processor)
+        public Fork<T> AddStep(AbstractStep<T> processor)
         {
             _steps.Add(processor);
             return this;
         }
 
-        public List<Step<T>> GetSteps()
+        public List<AbstractStep<T>> GetSteps()
         {
             return _steps;
         }
 
-        public Fork<T> SetSteps(List<Step<T>> sequence)
+        public Fork<T> SetSteps(List<AbstractStep<T>> sequence)
         {
             _steps = sequence;
             return this;

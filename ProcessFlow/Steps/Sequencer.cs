@@ -5,27 +5,27 @@ using System.Threading.Tasks;
 
 namespace ProcessFlow.Steps
 {
-    public sealed class Sequencer<T> : Step<T> where T : class
+    public sealed class Sequencer<T> : AbstractStep<T> where T : class
     {
-        private List<Step<T>> _sequence;
+        private List<AbstractStep<T>> _sequence;
 
         public Sequencer(string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
         {
-            _sequence = new List<Step<T>>();
+            _sequence = new List<AbstractStep<T>>();
         }
 
-        public Sequencer<T> AddStep(Step<T> processor)
+        public Sequencer<T> AddStep(AbstractStep<T> processor)
         {
             _sequence.Add(processor);
             return this;
         }
 
-        public List<Step<T>> GetSequence()
+        public List<AbstractStep<T>> GetSequence()
         {
             return _sequence;
         }
 
-        public Sequencer<T> SetSequence(List<Step<T>> sequence)
+        public Sequencer<T> SetSequence(List<AbstractStep<T>> sequence)
         {
             _sequence = sequence;
             return this;

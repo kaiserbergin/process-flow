@@ -4,6 +4,7 @@ using ProcessFlow.Exceptions;
 using ProcessFlow.Data;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 using ProcessFlow.Steps;
 
 namespace ProcessFlow.Tests.Steps
@@ -20,10 +21,40 @@ namespace ProcessFlow.Tests.Steps
         }
 
         [Fact]
+        public async void Create_WithSyncAction_Works()
+        {
+            // Arrange
+            var step = Step<SimpleWorkflowState>.Create(state => state.MyInteger++);
+
+            // Act
+            var result = await step.ExecuteAsync(_workflowState);
+
+            // Assert
+            Assert.Equal(_originalWorfklowState.MyInteger + 1, result.State.MyInteger);
+        }
+        
+        [Fact]
+        public async void Create_WithAsyncAction_Works()
+        {
+            // Arrange
+            var step = Step<SimpleWorkflowState>.Create(async state =>
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(5));
+                state.MyInteger++;
+            });
+
+            // Act
+            var result = await step.ExecuteAsync(_workflowState);
+
+            // Assert
+            Assert.Equal(_originalWorfklowState.MyInteger + 1, result.State.MyInteger);
+        }
+        
+        [Fact]
         public async void ExceptionCaughtAndRethrownAsWorkflowActionException()
         {
             // Arrange
-            var stepThatThrowsException = new ExceptionalStep();
+            var stepThatThrowsException = Step<SimpleWorkflowState>.Create(_ => throw new NotImplementedException());
 
             // Actsert
             var exeception = await Assert.ThrowsAsync<WorkflowActionException<SimpleWorkflowState>>(async () => await stepThatThrowsException.ExecuteAsync(_workflowState));
