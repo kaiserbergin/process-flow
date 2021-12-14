@@ -22,21 +22,14 @@ namespace ProcessFlow.Steps.Base
             return previous;
         }
 
-        public static Fork<TState> Fork<TState>(this AbstractStep<TState> source, string? name = null, StepSettings? stepSettings = null) where TState : class
+        public static Fork<TState> Fork<TState>(this IStep<TState> source, string? name = null, StepSettings? stepSettings = null, List<IStep<TState>>? steps = null) where TState : class
         {
-            var fork = new Fork<TState>(name, stepSettings);
+            var fork = new Fork<TState>(name, stepSettings, steps);
             source.SetNextStep(fork);
             return fork;
         }
 
-        public static Fork<TState> Fork<TState>(this AbstractStep<TState> source, List<AbstractStep<TState>> steps, string? name = null, StepSettings? stepSettings = null) where TState : class
-        {
-            var fork = new Fork<TState>(steps, name, stepSettings);
-            source.SetNextStep(fork);
-            return fork;
-        }
-
-        public static Fork<TState> Fork<TState>(this AbstractStep<TState> source, string? name = null, StepSettings? stepSettings = null, params AbstractStep<TState>[] steps) where TState : class
+        public static Fork<TState> Fork<TState>(this IStep<TState> source, string? name = null, StepSettings? stepSettings = null, params IStep<TState>[] steps) where TState : class
         {
             var fork = new Fork<TState>(name, stepSettings, steps);
             source.SetNextStep(fork);

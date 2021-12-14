@@ -7,37 +7,36 @@ using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Forks
 {
-    public sealed class Fork<T> : AbstractStep<T> where T : class
+    public sealed class Fork<T> : AbstractStep<T>, IFork<T> where T : class
     {
-        private List<AbstractStep<T>> _steps;
+        private List<IStep<T>> _steps;
 
-        public Fork(string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
+        public Fork(string? name = null, StepSettings? stepSettings = null, List<IStep<T>>? steps = null) : base(name, stepSettings)
         {
-            _steps = new List<AbstractStep<T>>();
+            _steps = steps ?? new List<IStep<T>>();
         }
 
-        public Fork(List<AbstractStep<T>> steps, string? name = null, StepSettings? stepSettings = null) : base(name, stepSettings)
-        {
-            _steps = steps;
-        }
-
-        public Fork(string? name = null, StepSettings? stepSettings = null, params AbstractStep<T>[] steps) : base(name, stepSettings)
+        public Fork(string? name = null, StepSettings? stepSettings = null, params IStep<T>[] steps) : base(name, stepSettings)
         {
             _steps = steps.ToList();
         }
 
-        public Fork<T> AddStep(AbstractStep<T> processor)
+        public static IFork<T> Create(string? name = null, StepSettings? stepSettings = null, List<IStep<T>>? steps = null) => new Fork<T>(name, stepSettings, steps);
+
+        public static IFork<T> Create(string? name = null, StepSettings? stepSettings = null, params IStep<T>[] steps) => new Fork<T>(name, stepSettings, steps);
+
+        public Fork<T> AddStep(IStep<T> processor)
         {
             _steps.Add(processor);
             return this;
         }
 
-        public List<AbstractStep<T>> GetSteps()
+        public List<IStep<T>> GetSteps()
         {
             return _steps;
         }
 
-        public Fork<T> SetSteps(List<AbstractStep<T>> sequence)
+        public Fork<T> SetSteps(List<IStep<T>> sequence)
         {
             _steps = sequence;
             return this;
