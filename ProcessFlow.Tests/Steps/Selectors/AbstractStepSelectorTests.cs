@@ -36,6 +36,20 @@ namespace ProcessFlow.Tests.Steps.Selectors
             Assert.Equal(expectedStepsExecutedCount, result.WorkflowChain.Count);
             Assert.True(expectedStepsExecuted.SequenceEqual(result.WorkflowChain.ToList().Select(x => x.StepName)));
         }
+        
+        [Fact]
+        public void Options_ReturnsSuccessfully()
+        {
+            // Arrange
+            var selector = new Selector();
+
+            // Act
+            var result = selector.Options();
+
+            // Assert
+            Assert.IsType<Dictionary<string, IStep<SimpleWorkflowState>>>(result);
+            Assert.Equal(OptionsGenerator.GetDictionaryOptions().Count, result.Count);
+        }
     }
 
     public class Selector : AbstractStepSelector<SimpleWorkflowState>

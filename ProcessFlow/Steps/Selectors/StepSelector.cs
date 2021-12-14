@@ -54,10 +54,7 @@ namespace ProcessFlow.Steps.Selectors
         {
             if (_selectAsync != null)
                 return await _selectAsync(workflowState, options, Terminate, cancellationToken);
-            if (_selectSync != null)
-                return _selectSync(workflowState, options, Terminate);
-
-            return new List<IStep<TState>>();
+            return _selectSync != null ? _selectSync(workflowState, options, Terminate) : new List<IStep<TState>>();
         }
     }
 }

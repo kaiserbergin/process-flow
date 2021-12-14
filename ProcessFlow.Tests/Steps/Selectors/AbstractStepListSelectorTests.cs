@@ -27,17 +27,31 @@ namespace ProcessFlow.Tests.Steps.Selectors
             var expectedIntegerValue = 2;
             var expectedStepsExecutedCount = 3;
             var expectedStepsExecuted = new[] { nameof(ListSelector), StepConstants.FIRST_STEP_NAME, StepConstants.THIRD_STEP_NAME };
-            
+
             // Act
             var result = await listSelector.ExecuteAsync(_workflowState);
-            
+
             // Assert
             Assert.Equal(expectedIntegerValue, result.State.MyInteger);
             Assert.Equal(expectedStepsExecutedCount, result.WorkflowChain.Count);
             Assert.True(expectedStepsExecuted.SequenceEqual(result.WorkflowChain.ToList().Select(x => x.StepName)));
         }
+
+        [Fact]
+        public void Options_ReturnsSuccessfully()
+        {
+            // Arrange
+            var listSelector = new ListSelector();
+
+            // Act
+            var result = listSelector.Options();
+
+            // Assert
+            Assert.IsType<List<IStep<SimpleWorkflowState>>>(result);
+            Assert.Equal(OptionsGenerator.GetOptionsList().Count, result.Count);
+        }
     }
-    
+
     public class ListSelector : AbstractStepListSelector<SimpleWorkflowState>
     {
         public ListSelector()
@@ -46,8 +60,8 @@ namespace ProcessFlow.Tests.Steps.Selectors
         }
 
         protected override Task<List<IStep<SimpleWorkflowState>>> SelectAsync(
-            WorkflowState<SimpleWorkflowState> workflowState, 
-            List<IStep<SimpleWorkflowState>> options, 
+            WorkflowState<SimpleWorkflowState> workflowState,
+            List<IStep<SimpleWorkflowState>> options,
             CancellationToken cancellationToken = default) => Task.FromResult(new List<IStep<SimpleWorkflowState>> { options.First(), options.Last() });
     }
 }
