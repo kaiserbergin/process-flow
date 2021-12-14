@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
@@ -78,9 +79,7 @@ namespace ProcessFlow.Tests.Steps
             firstBaseStep.Fork(
                 name: forkStepName,
                 stepSettings: settings,
-                secondStepAsync,
-                exceptionalStep,
-                fourthStepAsync);
+                new List<IStep<SimpleWorkflowState>> { secondStepAsync, exceptionalStep, fourthStepAsync });
 
             var expectedExecutionStarted = new[] { firstStepName, forkStepName, secondStepName, exceptionalStepName, fourthStepName };
             var expectedExecutionCompletionOrder = new[] { firstStepName, fourthStepName, secondStepName };
