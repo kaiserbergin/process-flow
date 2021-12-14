@@ -29,7 +29,7 @@ namespace ProcessFlow.Tests.Steps.Selectors
             var expectedStepsExecuted = new[] { "StepSelector`1", StepConstants.SECOND_STEP_NAME };
             
             var options = OptionsGenerator.GetDictionaryOptions();
-            Func<WorkflowState<SimpleWorkflowState>?, Dictionary<string, IStep<SimpleWorkflowState>>, Action, CancellationToken, Task<List<IStep<SimpleWorkflowState>>>> selectAsync =
+            Func<WorkflowState<SimpleWorkflowState>, Dictionary<string, IStep<SimpleWorkflowState>>, Action, CancellationToken, Task<List<IStep<SimpleWorkflowState>>>> selectAsync =
                 (_, options, _, _) => Task.FromResult(new List<IStep<SimpleWorkflowState>> { options[StepConstants.SECOND_STEP_NAME] });
             
             var stepSelector = StepSelector<SimpleWorkflowState>.Create(selectAsync, options);
@@ -52,7 +52,7 @@ namespace ProcessFlow.Tests.Steps.Selectors
             var expectedStepsExecuted = new[] { "StepSelector`1", StepConstants.SECOND_STEP_NAME };
             
             var options = OptionsGenerator.GetDictionaryOptions();
-            Func<WorkflowState<SimpleWorkflowState>?, Dictionary<string, IStep<SimpleWorkflowState>>, Action, List<IStep<SimpleWorkflowState>>> selectSync =
+            Func<WorkflowState<SimpleWorkflowState>, Dictionary<string, IStep<SimpleWorkflowState>>, Action, List<IStep<SimpleWorkflowState>>> selectSync =
                 (_, options, _) => new List<IStep<SimpleWorkflowState>> { options[StepConstants.SECOND_STEP_NAME] };
             
             var stepSelector = StepSelector<SimpleWorkflowState>.Create(selectSync, options);
