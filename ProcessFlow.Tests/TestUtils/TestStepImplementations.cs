@@ -95,11 +95,14 @@ namespace ProcessFlow.Tests.TestUtils
         }
     }
 
-    public class BaseSelector : SingleStepSelector<SimpleWorkflowState>
+    public class BaseSelector : AbstractStepListSelector<SimpleWorkflowState>
     {
-        protected override Task<AbstractStep<SimpleWorkflowState>> SelectAsync(List<AbstractStep<SimpleWorkflowState>> options, WorkflowState<SimpleWorkflowState> workflowState, CancellationToken cancellationToken)
+        protected override Task<List<IStep<SimpleWorkflowState>>> SelectAsync(
+            List<IStep<SimpleWorkflowState>> options, 
+            WorkflowState<SimpleWorkflowState> workflowState, 
+            CancellationToken? cancellationToken = default)
         {
-            return Task.FromResult(options.First());
+            return Task.FromResult(new List<IStep<SimpleWorkflowState>> { options.First() });
         }
     }
 

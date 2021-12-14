@@ -34,7 +34,7 @@ namespace ProcessFlow.Tests.PokeTests
             var releaseEamAllStep = new ReleaseEmAllStep(stepSettings: settings);
 
             var pickYourPathStep = new PickYourPathSelector(stepSettings: settings);
-            pickYourPathStep.SetOptions(new List<AbstractStep<PokeState>> { findPokemonStep, getMorePokeBallsStep, releaseEamAllStep });
+            pickYourPathStep.SetOptions(new List<IStep<PokeState>> { findPokemonStep, getMorePokeBallsStep, releaseEamAllStep });
 
             var walkStep = new WalkStep(stepSettings: settings);
             var chewGumStep = new ChewGumStep(stepSettings: settings);
