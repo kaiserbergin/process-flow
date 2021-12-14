@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
+using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {
@@ -31,9 +32,9 @@ namespace ProcessFlow.Steps.Loops
             _shouldContinueAsync = shouldContinueAsync;
         }
 
-        protected override Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
+        protected override Task ProcessAsync(T? state, CancellationToken cancellationToken) => Task.CompletedTask;
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             while (await ShouldContinueAsync(workflowState.State, cancellationToken))
             {
@@ -53,8 +54,6 @@ namespace ProcessFlow.Steps.Loops
 
                 _currentIteration++;
             }
-
-            return workflowState;
         }
 
         private async Task<bool> ShouldContinueAsync(T? state, CancellationToken cancellationToken)

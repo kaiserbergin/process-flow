@@ -1,9 +1,10 @@
-﻿using ProcessFlow.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ProcessFlow.Data;
+using ProcessFlow.Steps.Base;
 
-namespace ProcessFlow.Steps
+namespace ProcessFlow.Steps.Sequencers
 {
     public sealed class Sequencer<T> : AbstractStep<T> where T : class
     {
@@ -31,16 +32,14 @@ namespace ProcessFlow.Steps
             return this;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             foreach (var process in _sequence)
             {
                 workflowState = await process.ExecuteAsync(workflowState, cancellationToken);
             }
-
-            return workflowState;
         }
 
-        protected override Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
+        protected override Task ProcessAsync(T? state, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
+using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {
@@ -40,17 +41,15 @@ namespace ProcessFlow.Steps.Loops
             _setIterationCountAsync = setIterationCountAsync;
         }
 
-        protected override async Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken)
+        protected override async Task ProcessAsync(T? state, CancellationToken cancellationToken)
         {
             if (_setIterationCount != null)
                 _iterationCount = _setIterationCount(state);
             else if (_setIterationCountAsync != null)
                 _iterationCount = await _setIterationCountAsync(state, cancellationToken).ConfigureAwait(false);
-
-            return state;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             for (var i = 0; i < _iterationCount; i++)
             {
@@ -70,7 +69,6 @@ namespace ProcessFlow.Steps.Loops
 
                 _currentIteration++;
             }
-            return workflowState;
         }
     }
     

@@ -2,28 +2,29 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
+using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {
     public sealed class LoopStep<TState> : AbstractLoopStep<TState> where TState : class
     {
-        private readonly Func<TState?, Action, Action, Action, int, CancellationToken, Task<TState?>> _processFunc;
+        private readonly Func<TState?, Action, Action, Action, int, CancellationToken, Task> _processFunc;
 
-        internal LoopStep(Func<TState?, Action, Action, Action, int, CancellationToken, Task<TState?>> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
+        internal LoopStep(Func<TState?, Action, Action, Action, int, CancellationToken, Task> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
             : base(name, stepSettings, clock)
         {
             _processFunc = processFunc;
         }
 
         public static IStep<TState> Create(
-            Func<TState?, Action, Action, Action, int, CancellationToken, Task<TState?>> processFunc,
+            Func<TState?, Action, Action, Action, int, CancellationToken, Task> processFunc,
             string? name = null,
             StepSettings? stepSettings = null,
             IClock? clock = null) =>
             new LoopStep<TState>(processFunc, name, stepSettings, clock);
 
         public static IStep<TState> Create(
-            Func<TState?, Action, Action, Action, int, Task<TState?>> processFunc,
+            Func<TState?, Action, Action, Action, int, Task> processFunc,
             string? name = null,
             StepSettings? stepSettings = null,
             IClock? clock = null) =>
@@ -33,7 +34,7 @@ namespace ProcessFlow.Steps.Loops
                 stepSettings,
                 clock);
 
-        protected override async Task<TState?> ProcessAsync(TState? state, CancellationToken cancellationToken) =>
+        protected override async Task ProcessAsync(TState? state, CancellationToken cancellationToken) =>
             await _processFunc(state, Terminate, Break, Continue, CurrentIteration, cancellationToken);
     }
 }

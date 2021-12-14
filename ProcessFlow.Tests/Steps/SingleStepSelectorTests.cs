@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
 using ProcessFlow.Tests.TestUtils;
 using Xunit;
 

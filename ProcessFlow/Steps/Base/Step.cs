@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 
-namespace ProcessFlow.Steps
+namespace ProcessFlow.Steps.Base
 {
     public sealed class Step<TState> : AbstractStep<TState> where TState : class
     {
@@ -37,14 +37,12 @@ namespace ProcessFlow.Steps
         public static IStep<TState> Create(Action<TState?, Action> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null) =>
             new Step<TState>(processFunc, name, stepSettings, clock);
 
-        protected override async Task<TState?> ProcessAsync(TState? state, CancellationToken cancellationToken)
+        protected override async Task ProcessAsync(TState? state, CancellationToken cancellationToken)
         {
             if (_processActionAsync != null)
                 await _processActionAsync(state, Terminate, cancellationToken);
             if (_processActionSync != null)
                 _processActionSync(state, Terminate);
-            
-            return state;
         }
     }
 }

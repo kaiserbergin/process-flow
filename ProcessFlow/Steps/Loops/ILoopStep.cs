@@ -1,3 +1,5 @@
+using ProcessFlow.Steps.Base;
+
 namespace ProcessFlow.Steps.Loops
 {
     public interface ILoopStep<TStep> : IStep<TStep> where TStep : class

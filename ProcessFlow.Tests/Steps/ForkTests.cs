@@ -2,6 +2,7 @@ using System.Linq;
 using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
 using ProcessFlow.Tests.TestUtils;
 using Xunit;
 

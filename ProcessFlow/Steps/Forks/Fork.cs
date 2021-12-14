@@ -1,10 +1,11 @@
-﻿using ProcessFlow.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ProcessFlow.Data;
+using ProcessFlow.Steps.Base;
 
-namespace ProcessFlow.Steps
+namespace ProcessFlow.Steps.Forks
 {
     public sealed class Fork<T> : AbstractStep<T> where T : class
     {
@@ -42,7 +43,7 @@ namespace ProcessFlow.Steps
             return this;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             var taskList = new List<Task>();
 
@@ -52,10 +53,8 @@ namespace ProcessFlow.Steps
             }
 
             await Task.WhenAll(taskList);
-
-            return workflowState;
         }
 
-        protected override Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken) => Task.FromResult(state);
+        protected override Task ProcessAsync(T? state, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
+using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {

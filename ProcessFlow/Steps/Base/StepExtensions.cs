@@ -1,20 +1,21 @@
-﻿using ProcessFlow.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ProcessFlow.Data;
+using ProcessFlow.Steps.Forks;
 
-namespace ProcessFlow.Steps
+namespace ProcessFlow.Steps.Base
 {
     public static class StepExtensions
     {
-        public static TStep SetNext<TStep, TState>(this AbstractStep<TState> source, TStep next)
-             where TStep : AbstractStep<TState>
+        public static TStep SetNext<TStep, TState>(this IStep<TState> source, TStep next)
+             where TStep : IStep<TState>
              where TState : class
         {
             source.SetNextStep(next);
             return next;
         }
 
-        public static TStep SetPrevious<TStep, TState>(this AbstractStep<TState> source, TStep previous)
-            where TStep : AbstractStep<TState>
+        public static TStep SetPrevious<TStep, TState>(this IStep<TState> source, TStep previous)
+            where TStep : IStep<TState>
             where TState : class
         {
             source.SetPreviousStep(previous);

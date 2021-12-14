@@ -1,9 +1,10 @@
-﻿using ProcessFlow.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ProcessFlow.Data;
+using ProcessFlow.Steps.Base;
 
-namespace ProcessFlow.Steps
+namespace ProcessFlow.Steps.Selectors
 {
     public abstract class SingleStepSelector<T> : AbstractStep<T> where T : class
     {
@@ -24,17 +25,13 @@ namespace ProcessFlow.Steps
             return this;
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {
             var selectedProcessor = await SelectAsync(_options, workflowState, cancellationToken);
             await selectedProcessor.ExecuteAsync(workflowState, cancellationToken);
-            return workflowState;
         }
 
-        protected override Task<T?> ProcessAsync(T? state, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(state);
-        }
+        protected override Task ProcessAsync(T? state, CancellationToken cancellationToken) => Task.CompletedTask;
 
         protected abstract Task<AbstractStep<T>> SelectAsync(List<AbstractStep<T>> options, WorkflowState<T> workflowState, CancellationToken cancellationToken);
     }

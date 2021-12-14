@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ProcessFlow.Steps.Base;
 using ProcessFlow.Steps.Loops;
+using ProcessFlow.Steps.Selectors;
 
 namespace ProcessFlow.Tests.TestUtils
 {

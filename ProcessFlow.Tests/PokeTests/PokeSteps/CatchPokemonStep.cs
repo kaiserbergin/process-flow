@@ -13,7 +13,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<PokeState> ProcessAsync(PokeState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(PokeState state, CancellationToken cancellationToken)
         {
             if (state.PokeBallCount == 0 || state.EncounteredMon == null)
                 Break();
@@ -38,8 +38,8 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
 
             if (CurrentIteration == 3)
                 state.EncounteredMon = null; // Ran away!
-        
-            return Task.FromResult(state);
+            
+            return Task.CompletedTask;
         }
     }
 }

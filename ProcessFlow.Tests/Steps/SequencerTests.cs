@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
+using ProcessFlow.Steps.Sequencers;
 using ProcessFlow.Tests.TestUtils;
 using Xunit;
 

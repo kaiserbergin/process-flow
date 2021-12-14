@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using System.Threading.Tasks;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Tests.Steps
 {
@@ -209,6 +210,36 @@ namespace ProcessFlow.Tests.Steps
 
             Assert.Equal(StepActivityStages.Executing, secondLink.StepActivities.First().Activity);
             Assert.Equal(StepActivityStages.ExecutionCompleted, secondLink.StepActivities.Last().Activity);
+        }
+        
+        [Fact]
+        public async void ExecuteAsync_WithAutoProgressSettingAndTerminate_StopsFlow()
+        {
+            // Arrange
+            var baseStepName = "base"; 
+            var nextStepName = "next";
+            var settings = new StepSettings() { AutoProgress = true, TrackStateChanges = true };
+
+            var originStep = Step<SimpleWorkflowState>.Create(((_, terminate) => terminate()), stepSettings: settings); 
+            var nextStep = new BaseStep(name: nextStepName, stepSettings: settings);
+            
+            originStep.SetNext(nextStep);
+
+            // Act
+            var result = await originStep.ExecuteAsync(_workflowState);
+
+            // Assert
+            Assert.Equal(_originalWorfklowState.MyInteger, result.State.MyInteger);
+            Assert.Equal(1, result.WorkflowChain.Count);
+
+            var firstLink = result.WorkflowChain.First.Value;
+
+            Assert.Equal(originStep.Id, firstLink.StepIdentifier);
+            Assert.Equal(0, firstLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
+            Assert.Equal(0, result.State.MyInteger);
+
+            Assert.Equal(StepActivityStages.Executing, firstLink.StepActivities.First().Activity);
+            Assert.Equal(StepActivityStages.ExecutionTerminated, firstLink.StepActivities.Last().Activity);
         }
         
         [Fact]
