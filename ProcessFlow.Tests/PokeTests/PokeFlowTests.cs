@@ -27,7 +27,7 @@ namespace ProcessFlow.Tests.PokeTests
             
             var catchLoop = new ForLoop<PokeState>(
                 iterations: catchAttemptsPerMon,
-                steps: new List<AbstractStep<PokeState>> { catchPokemonStep },
+                steps: new List<IStep<PokeState>> { catchPokemonStep },
                 stepSettings: settings);
 
             var getMorePokeBallsStep = new GetMorePokeBallsStep(stepSettings: settings);

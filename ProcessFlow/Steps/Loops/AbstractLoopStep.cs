@@ -4,7 +4,7 @@ using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {
-    public abstract class AbstractLoopStep<TState> : AbstractStep<TState>, ILoopStep<TState> where TState : class
+    public abstract class AbstractLoopStep<TState> : AbstractStep<TState> where TState : class
     {
         private int _currentIteration = 0;
         public int CurrentIteration => _currentIteration;

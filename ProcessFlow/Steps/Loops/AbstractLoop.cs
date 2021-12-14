@@ -6,22 +6,22 @@ using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {
-    public abstract class Loop<T> : AbstractStep<T> where T : class
+    public abstract class AbstractLoop<T> : AbstractStep<T> where T : class
     {
         protected int _currentIteration;
-        protected List<AbstractStep<T>> _steps;
+        protected List<IStep<T>> _steps;
 
-        protected Loop(string? name = null, StepSettings? stepSettings = null, List<AbstractStep<T>>? steps = null) : base(name, stepSettings)
+        protected AbstractLoop(string? name = null, StepSettings? stepSettings = null, List<IStep<T>>? steps = null) : base(name, stepSettings)
         {
-            _steps = steps ?? new List<AbstractStep<T>>();
+            _steps = steps ?? new List<IStep<T>>();
         }
 
-        public List<AbstractStep<T>> Steps => _steps;
+        public List<IStep<T>> Steps => _steps;
         public int CurrentIteration => _currentIteration;
 
-        public void SetSteps(List<AbstractStep<T>> steps) => _steps = steps;
-        public void AddStep(AbstractStep<T> step) => _steps.Add(step);
-        public void ClearSteps() => _steps = new List<AbstractStep<T>>();
+        public void SetSteps(List<IStep<T>> steps) => _steps = steps;
+        public void AddStep(IStep<T> step) => _steps.Add(step);
+        public void ClearSteps() => _steps = new List<IStep<T>>();
         
         protected async Task IterateAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
         {

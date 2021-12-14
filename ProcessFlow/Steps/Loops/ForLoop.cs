@@ -8,7 +8,7 @@ using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {
-    public sealed class ForLoop<T> : Loop<T> where T : class
+    public sealed class ForLoop<T> : AbstractLoop<T> where T : class
     {
         private int _iterationCount;
         private readonly Func<T?, int>? _setIterationCount;
@@ -18,16 +18,16 @@ namespace ProcessFlow.Steps.Loops
             int iterations,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _iterationCount = iterations;
         }
-        
+
         public ForLoop(
             Func<T?, int> setIterationCount,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _setIterationCount = setIterationCount;
         }
@@ -36,10 +36,28 @@ namespace ProcessFlow.Steps.Loops
             Func<T?, CancellationToken, Task<int>> setIterationCountAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<AbstractStep<T>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<T>>? steps = null) : base(name, stepSettings, steps)
         {
             _setIterationCountAsync = setIterationCountAsync;
         }
+
+        public static ForLoop<T> Create(
+            int iterations,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<IStep<T>>? steps = null) => new ForLoop<T>(iterations, name, stepSettings, steps);
+
+        public static ForLoop<T> Create(
+            Func<T?, int> setIterationCount,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<IStep<T>>? steps = null) => new ForLoop<T>(setIterationCount, name, stepSettings, steps);
+
+        public static ForLoop<T> Create(
+            Func<T?, CancellationToken, Task<int>> setIterationCountAsync,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<IStep<T>>? steps = null) => new ForLoop<T>(setIterationCountAsync, name, stepSettings, steps);
 
         protected override async Task ProcessAsync(T? state, CancellationToken cancellationToken)
         {
@@ -71,6 +89,4 @@ namespace ProcessFlow.Steps.Loops
             }
         }
     }
-    
-    
 }

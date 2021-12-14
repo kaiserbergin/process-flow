@@ -216,7 +216,6 @@ namespace ProcessFlow.Tests.Steps
         public async void ExecuteAsync_WithAutoProgressSettingAndTerminate_StopsFlow()
         {
             // Arrange
-            var baseStepName = "base"; 
             var nextStepName = "next";
             var settings = new StepSettings() { AutoProgress = true, TrackStateChanges = true };
 
@@ -230,7 +229,7 @@ namespace ProcessFlow.Tests.Steps
 
             // Assert
             Assert.Equal(_originalWorfklowState.MyInteger, result.State.MyInteger);
-            Assert.Equal(1, result.WorkflowChain.Count);
+            Assert.Single(result.WorkflowChain);
 
             var firstLink = result.WorkflowChain.First.Value;
 
