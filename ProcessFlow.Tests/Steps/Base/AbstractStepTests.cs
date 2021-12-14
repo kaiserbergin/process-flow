@@ -1,56 +1,25 @@
-﻿using Xunit;
-using ProcessFlow.Tests.TestUtils;
-using ProcessFlow.Exceptions;
-using ProcessFlow.Data;
+﻿using System;
 using System.Linq;
-using System;
 using System.Threading.Tasks;
-using ProcessFlow.Steps;
+using ProcessFlow.Data;
+using ProcessFlow.Exceptions;
 using ProcessFlow.Steps.Base;
+using ProcessFlow.Tests.TestUtils;
+using Xunit;
 
-namespace ProcessFlow.Tests.Steps
+namespace ProcessFlow.Tests.Steps.Base
 {
-    public class StepTests
+    public class AbstractStepTests
     {
         private WorkflowState<SimpleWorkflowState> _workflowState;
         private SimpleWorkflowState _originalWorfklowState;
 
-        public StepTests()
+        public AbstractStepTests()
         {
             _workflowState = new WorkflowState<SimpleWorkflowState>() { State = new SimpleWorkflowState() };
             _originalWorfklowState = _workflowState.State.DeepCopy();
         }
 
-        [Fact]
-        public async void Create_WithSyncAction_Works()
-        {
-            // Arrange
-            var step = Step<SimpleWorkflowState>.Create(state => state.MyInteger++);
-
-            // Act
-            var result = await step.ExecuteAsync(_workflowState);
-
-            // Assert
-            Assert.Equal(_originalWorfklowState.MyInteger + 1, result.State.MyInteger);
-        }
-        
-        [Fact]
-        public async void Create_WithAsyncAction_Works()
-        {
-            // Arrange
-            var step = Step<SimpleWorkflowState>.Create(async state =>
-            {
-                await Task.Delay(TimeSpan.FromMilliseconds(5));
-                state.MyInteger++;
-            });
-
-            // Act
-            var result = await step.ExecuteAsync(_workflowState);
-
-            // Assert
-            Assert.Equal(_originalWorfklowState.MyInteger + 1, result.State.MyInteger);
-        }
-        
         [Fact]
         public async void ExceptionCaughtAndRethrownAsWorkflowActionException()
         {
