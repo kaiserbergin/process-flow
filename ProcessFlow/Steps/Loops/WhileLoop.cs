@@ -8,45 +8,45 @@ using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {
-    public sealed class WhileLoop<T> : AbstractLoop<T> where T : class
+    public sealed class WhileLoop<TState> : AbstractLoop<TState> where TState : class
     {
-        private readonly Func<T?, bool>? _shouldContinue;
-        private readonly Func<T?, CancellationToken, Task<bool>>? _shouldContinueAsync;
+        private readonly Func<TState?, bool>? _shouldContinue;
+        private readonly Func<TState?, CancellationToken, Task<bool>>? _shouldContinueAsync;
 
-        public WhileLoop(string? name = null, StepSettings? stepSettings = null, List<IStep<T>>? steps = null) : base(name, stepSettings, steps) { }
+        public WhileLoop(string? name = null, StepSettings? stepSettings = null, List<IStep<TState>>? steps = null) : base(name, stepSettings, steps) { }
         public WhileLoop(
-            Func<T?, bool> shouldContinue,
+            Func<TState?, bool> shouldContinue,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<T>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<TState>>? steps = null) : base(name, stepSettings, steps)
         {
             _shouldContinue = shouldContinue;
         }
 
         public WhileLoop(
-            Func<T?, CancellationToken, Task<bool>> shouldContinueAsync,
+            Func<TState?, CancellationToken, Task<bool>> shouldContinueAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<T>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<TState>>? steps = null) : base(name, stepSettings, steps)
         {
             _shouldContinueAsync = shouldContinueAsync;
         }
 
-        public static WhileLoop<T> Create(
-            Func<T?, bool> shouldContinue,
+        public static WhileLoop<TState> Create(
+            Func<TState?, bool> shouldContinue,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<T>>? steps = null) => new WhileLoop<T>(shouldContinue, name, stepSettings);
+            List<IStep<TState>>? steps = null) => new WhileLoop<TState>(shouldContinue, name, stepSettings);
 
-        public static WhileLoop<T> Create(
-            Func<T?, CancellationToken, Task<bool>> shouldContinueAsync,
+        public static WhileLoop<TState> Create(
+            Func<TState?, CancellationToken, Task<bool>> shouldContinueAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<T>>? steps = null) => new WhileLoop<T>(shouldContinueAsync, name, stepSettings);
+            List<IStep<TState>>? steps = null) => new WhileLoop<TState>(shouldContinueAsync, name, stepSettings);
 
-        protected override Task ProcessAsync(T? state, CancellationToken cancellationToken) => Task.CompletedTask;
+        protected override Task ProcessAsync(TState? state, CancellationToken cancellationToken) => Task.CompletedTask;
 
-        protected override async Task ExecuteExtensionProcessAsync(WorkflowState<T> workflowState, CancellationToken cancellationToken)
+        protected override async Task ExecuteExtensionProcessAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken)
         {
             while (await ShouldContinueAsync(workflowState.State, cancellationToken))
             {
@@ -68,7 +68,7 @@ namespace ProcessFlow.Steps.Loops
             }
         }
 
-        private async Task<bool> ShouldContinueAsync(T? state, CancellationToken cancellationToken)
+        private async Task<bool> ShouldContinueAsync(TState? state, CancellationToken cancellationToken)
         {
             if (_shouldContinue != null)
                 return _shouldContinue(state);

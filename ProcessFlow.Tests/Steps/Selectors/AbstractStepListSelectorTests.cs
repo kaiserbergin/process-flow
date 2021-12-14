@@ -42,18 +42,12 @@ namespace ProcessFlow.Tests.Steps.Selectors
     {
         public ListSelector()
         {
-            var firstStep = Step<SimpleWorkflowState>.Create(state => state.MyInteger++, name: StepConstants.FIRST_STEP_NAME);
-            var secondStep = Step<SimpleWorkflowState>.Create(state => state.MyInteger++, name: StepConstants.SECOND_STEP_NAME);
-            var thirdStep = Step<SimpleWorkflowState>.Create(state => state.MyInteger++, name: StepConstants.THIRD_STEP_NAME);
-
-            var options = new List<IStep<SimpleWorkflowState>> { firstStep, secondStep, thirdStep };
-
-            SetOptions(options);
+            SetOptions(OptionsGenerator.GetOptionsList());
         }
 
         protected override Task<List<IStep<SimpleWorkflowState>>> SelectAsync(
-            List<IStep<SimpleWorkflowState>> options, 
             WorkflowState<SimpleWorkflowState> workflowState, 
-            CancellationToken? cancellationToken = default) => Task.FromResult(new List<IStep<SimpleWorkflowState>> { options.First(), options.Last() });
+            List<IStep<SimpleWorkflowState>> options, 
+            CancellationToken cancellationToken = default) => Task.FromResult(new List<IStep<SimpleWorkflowState>> { options.First(), options.Last() });
     }
 }

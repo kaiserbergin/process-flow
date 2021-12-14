@@ -10,11 +10,11 @@ using Xunit;
 
 namespace ProcessFlow.Tests.Steps.Selectors
 {
-    public class AbstractStepDictionarySelectorTests
+    public class AbstractStepSelectorTests
     {
         private WorkflowState<SimpleWorkflowState> _workflowState;
 
-        public AbstractStepDictionarySelectorTests()
+        public AbstractStepSelectorTests()
         {
             _workflowState = new WorkflowState<SimpleWorkflowState>() { State = new SimpleWorkflowState() };
         }
@@ -23,10 +23,10 @@ namespace ProcessFlow.Tests.Steps.Selectors
         public async void ExecuteAsync_ForSpecificSteps_ExecutesDesiredSteps()
         {
             // Arrange
-            var dictionarySelector = new DictionarySelector();
+            var dictionarySelector = new Selector();
             var expectedIntegerValue = 2;
             var expectedStepsExecutedCount = 3;
-            var expectedStepsExecuted = new[] { nameof(DictionarySelector), StepConstants.FIRST_STEP_NAME, StepConstants.THIRD_STEP_NAME };
+            var expectedStepsExecuted = new[] { nameof(Selector), StepConstants.FIRST_STEP_NAME, StepConstants.THIRD_STEP_NAME };
             
             // Act
             var result = await dictionarySelector.ExecuteAsync(_workflowState);
@@ -38,28 +38,17 @@ namespace ProcessFlow.Tests.Steps.Selectors
         }
     }
 
-    public class DictionarySelector : AbstractStepDictionarySelector<SimpleWorkflowState>
+    public class Selector : AbstractStepSelector<SimpleWorkflowState>
     {
-        public DictionarySelector()
+        public Selector()
         {
-            var firstStep = Step<SimpleWorkflowState>.Create(state => state.MyInteger++, name: StepConstants.FIRST_STEP_NAME);
-            var secondStep = Step<SimpleWorkflowState>.Create(state => state.MyInteger++, name: StepConstants.SECOND_STEP_NAME);
-            var thirdStep = Step<SimpleWorkflowState>.Create(state => state.MyInteger++, name: StepConstants.THIRD_STEP_NAME);
-
-            var options = new Dictionary<string, IStep<SimpleWorkflowState>>
-            {
-                { StepConstants.FIRST_STEP_NAME, firstStep },
-                { StepConstants.SECOND_STEP_NAME, secondStep },
-                { StepConstants.THIRD_STEP_NAME, thirdStep },
-            };
-
-            SetOptions(options);
+            SetOptions(OptionsGenerator.GetDictionaryOptions());
         }
 
         protected override Task<List<IStep<SimpleWorkflowState>>> SelectAsync(
-            Dictionary<string, IStep<SimpleWorkflowState>> options,
             WorkflowState<SimpleWorkflowState> workflowState,
-            CancellationToken? cancellationToken = default) =>
+            Dictionary<string, IStep<SimpleWorkflowState>> options,
+            CancellationToken cancellationToken = default) =>
             Task.FromResult(new List<IStep<SimpleWorkflowState>> { options[StepConstants.FIRST_STEP_NAME], options[StepConstants.THIRD_STEP_NAME] });
     }
 }

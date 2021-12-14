@@ -27,7 +27,7 @@ namespace ProcessFlow.Steps.Selectors
 
         protected override async Task ExecuteExtensionProcessAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken)
         {
-            var selectedProcessors = await SelectAsync(_options, workflowState, cancellationToken);
+            var selectedProcessors = await SelectAsync(workflowState, _options, cancellationToken);
             
             foreach (var process in selectedProcessors)
             {
@@ -37,6 +37,6 @@ namespace ProcessFlow.Steps.Selectors
 
         protected override Task ProcessAsync(TState? state, CancellationToken cancellationToken) => Task.CompletedTask;
 
-        protected abstract Task<List<IStep<TState>>> SelectAsync(List<IStep<TState>> options, WorkflowState<TState> workflowState, CancellationToken? cancellationToken = default);
+        protected abstract Task<List<IStep<TState>>> SelectAsync(WorkflowState<TState> workflowState, List<IStep<TState>> options, CancellationToken cancellationToken = default);
     }
 }

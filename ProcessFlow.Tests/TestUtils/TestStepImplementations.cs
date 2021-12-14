@@ -98,9 +98,9 @@ namespace ProcessFlow.Tests.TestUtils
     public class BaseSelector : AbstractStepListSelector<SimpleWorkflowState>
     {
         protected override Task<List<IStep<SimpleWorkflowState>>> SelectAsync(
-            List<IStep<SimpleWorkflowState>> options, 
             WorkflowState<SimpleWorkflowState> workflowState, 
-            CancellationToken? cancellationToken = default)
+            List<IStep<SimpleWorkflowState>> options, 
+            CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new List<IStep<SimpleWorkflowState>> { options.First() });
         }

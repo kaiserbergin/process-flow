@@ -6,18 +6,23 @@ using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Selectors
 {
-    public abstract class AbstractStepDictionarySelector<TState> : AbstractStep<TState>, IStepDictionarySelector<TState> where TState : class
+    public abstract class AbstractStepSelector<TState> : AbstractStep<TState>, IStepSelector<TState> where TState : class
     {
         private Dictionary<string, IStep<TState>> _options;
 
-        public AbstractStepDictionarySelector(string? name = null, StepSettings? stepSettings = null, Dictionary<string, IStep<TState>>? options = null) : base(name, stepSettings)
+        public AbstractStepSelector(
+            string? name = null, 
+            StepSettings? stepSettings = null, 
+            Dictionary<string, IStep<TState>>? options = null, 
+            IClock? clock = null) 
+            : base(name, stepSettings, clock)
         {
             _options = options ?? new Dictionary<string, IStep<TState>>();
         }
 
         public Dictionary<string, IStep<TState>> Options() => _options;
 
-        public IStepDictionarySelector<TState> SetOptions(Dictionary<string, IStep<TState>> options)
+        public IStepSelector<TState> SetOptions(Dictionary<string, IStep<TState>> options)
         {
             _options = options;
             return this;
@@ -25,7 +30,7 @@ namespace ProcessFlow.Steps.Selectors
 
         protected override async Task ExecuteExtensionProcessAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken)
         {
-            var selectedProcessors = await SelectAsync(_options, workflowState, cancellationToken);
+            var selectedProcessors = await SelectAsync(workflowState, _options, cancellationToken);
             
             foreach (var process in selectedProcessors)
             {
@@ -35,6 +40,6 @@ namespace ProcessFlow.Steps.Selectors
 
         protected override Task ProcessAsync(TState? state, CancellationToken cancellationToken) => Task.CompletedTask;
 
-        protected abstract Task<List<IStep<TState>>> SelectAsync(Dictionary<string, IStep<TState>> options, WorkflowState<TState> workflowState, CancellationToken? cancellationToken = default);
+        protected abstract Task<List<IStep<TState>>> SelectAsync(WorkflowState<TState> workflowState, Dictionary<string, IStep<TState>> options, CancellationToken cancellationToken = default);
     }
 }
