@@ -19,7 +19,7 @@ namespace ProcessFlow.Steps.Selectors
             return _options;
         }
 
-        public AbstractStepListSelector<TState> SetOptions(List<IStep<TState>> options)
+        public IStepListSelector<TState> SetOptions(List<IStep<TState>> options)
         {
             _options = options;
             return this;

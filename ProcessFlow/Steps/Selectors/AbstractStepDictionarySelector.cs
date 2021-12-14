@@ -17,7 +17,7 @@ namespace ProcessFlow.Steps.Selectors
 
         public Dictionary<string, IStep<TState>> Options() => _options;
 
-        public AbstractStepDictionarySelector<TState> SetOptions(Dictionary<string, IStep<TState>> options)
+        public IStepDictionarySelector<TState> SetOptions(Dictionary<string, IStep<TState>> options)
         {
             _options = options;
             return this;
