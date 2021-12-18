@@ -13,7 +13,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<PokeState> ProcessAsync(PokeState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(PokeState state, CancellationToken cancellationToken)
         {
             for (int i = state.MyPokemon.Count - 1; i >= 0; i--)
             {
@@ -21,7 +21,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
                 state.MyPokemon.RemoveAt(i);
             }
 
-            return Task.FromResult(state);
+            return Task.CompletedTask;
         }
     }
 }

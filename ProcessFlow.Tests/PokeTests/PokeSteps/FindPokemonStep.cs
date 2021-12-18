@@ -14,7 +14,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
         {
         }
 
-        protected override Task<PokeState> ProcessAsync(PokeState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(PokeState state, CancellationToken cancellationToken)
         {
             state.EncounteredMon = new Faker<Pokemon>()
                 .StrictMode(false)
@@ -23,7 +23,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
                 .RuleFor(p => p.BaseCaptureChance, f => f.Random.Double(.1d, .5d))
                 .Generate();
 
-            return Task.FromResult(state);
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using ProcessFlow.Data;
-using ProcessFlow.Steps;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +10,13 @@ using ProcessFlow.Steps.Selectors;
 
 namespace ProcessFlow.Tests.TestUtils
 {
-    class TestStepImplementations
-    {
-    }
-
     public class ExceptionalStep : AbstractStep<SimpleWorkflowState>
     {
         public ExceptionalStep(string name = null, StepSettings stepSettings = null) : base(name, stepSettings)
         {
         }
 
-        protected override Task<SimpleWorkflowState> ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -33,11 +28,12 @@ namespace ProcessFlow.Tests.TestUtils
         {
         }
 
-        protected override Task<SimpleWorkflowState> ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
         {
             if (state != null)
                 state.MyInteger++;
-            return Task.FromResult(state);
+
+            return Task.CompletedTask;
         }
     }
 
@@ -47,11 +43,12 @@ namespace ProcessFlow.Tests.TestUtils
         {
         }
 
-        protected override Task<SimpleWorkflowState> ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
         {
             if (state != null)
                 state.MyInteger++;
-            return Task.FromResult(state);
+            
+            return Task.CompletedTask;
         }
     }
 
@@ -61,11 +58,12 @@ namespace ProcessFlow.Tests.TestUtils
         {
         }
 
-        protected override Task<SimpleWorkflowState> ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
         {
             if (state != null)
                 state.MyInteger++;
-            return Task.FromResult(state);
+
+            return Task.CompletedTask;
         }
     }
 
@@ -75,10 +73,11 @@ namespace ProcessFlow.Tests.TestUtils
         {
         }
 
-        protected override Task<SimpleWorkflowState> ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
         {
             Break();
-            return Task.FromResult(state);
+
+            return Task.CompletedTask;
         }
     }
 
@@ -88,10 +87,11 @@ namespace ProcessFlow.Tests.TestUtils
         {
         }
 
-        protected override Task<SimpleWorkflowState> ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
+        protected override Task ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
         {
             Continue();
-            return Task.FromResult(state);
+
+            return Task.CompletedTask;
         }
     }
 
@@ -119,14 +119,12 @@ namespace ProcessFlow.Tests.TestUtils
             _delayMs = delayMs;
         }
 
-        protected override async Task<SimpleWorkflowState> ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
+        protected override async Task ProcessAsync(SimpleWorkflowState state, CancellationToken cancellationToken)
         {
             await Task.Delay(TimeSpan.FromMilliseconds(_delayMs));
 
             if (state != null)
                 state.MyInteger++;
-
-            return state;
         }
     }
 }
