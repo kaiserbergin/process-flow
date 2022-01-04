@@ -8,23 +8,27 @@ namespace ProcessFlow.Steps.Loops
 {
     public sealed class LoopStep<TState> : AbstractLoopStep<TState> where TState : class
     {
-        private readonly Func<TState?, Action, Action, Action, int, CancellationToken, Task> _processFunc;
+        private readonly Func<TState?, TerminateDelegate, BreakDelegate, ContinueDelegate, int, CancellationToken, Task> _processFunc;
 
-        internal LoopStep(Func<TState?, Action, Action, Action, int, CancellationToken, Task> processFunc, string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
+        internal LoopStep(
+            Func<TState?, TerminateDelegate, BreakDelegate, ContinueDelegate, int, CancellationToken, Task> processFunc,
+            string? name = null, 
+            StepSettings? stepSettings = null, 
+            IClock? clock = null)
             : base(name, stepSettings, clock)
         {
             _processFunc = processFunc;
         }
 
         public static IStep<TState> Create(
-            Func<TState?, Action, Action, Action, int, CancellationToken, Task> processFunc,
+            Func<TState?, TerminateDelegate, BreakDelegate, ContinueDelegate, int, CancellationToken, Task> processFunc,
             string? name = null,
             StepSettings? stepSettings = null,
             IClock? clock = null) =>
             new LoopStep<TState>(processFunc, name, stepSettings, clock);
 
         public static IStep<TState> Create(
-            Func<TState?, Action, Action, Action, int, Task> processFunc,
+            Func<TState?, TerminateDelegate, BreakDelegate, ContinueDelegate, int, Task> processFunc,
             string? name = null,
             StepSettings? stepSettings = null,
             IClock? clock = null) =>

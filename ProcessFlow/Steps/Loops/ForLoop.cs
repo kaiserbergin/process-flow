@@ -14,11 +14,14 @@ namespace ProcessFlow.Steps.Loops
         private readonly Func<TState?, int>? _setIterationCount;
         private readonly Func<TState?, CancellationToken, Task<int>>? _setIterationCountAsync;
 
+        public int IterationCount => _iterationCount;
+
         public ForLoop(
             int iterations,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<TState>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) : base(name, stepSettings, steps, clock)
         {
             _iterationCount = iterations;
         }
@@ -27,7 +30,8 @@ namespace ProcessFlow.Steps.Loops
             Func<TState?, int> setIterationCount,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<TState>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) : base(name, stepSettings, steps, clock)
         {
             _setIterationCount = setIterationCount;
         }
@@ -36,7 +40,8 @@ namespace ProcessFlow.Steps.Loops
             Func<TState?, CancellationToken, Task<int>> setIterationCountAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<TState>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) : base(name, stepSettings, steps, clock)
         {
             _setIterationCountAsync = setIterationCountAsync;
         }
@@ -45,19 +50,22 @@ namespace ProcessFlow.Steps.Loops
             int iterations,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<TState>>? steps = null) => new ForLoop<TState>(iterations, name, stepSettings, steps);
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) => new ForLoop<TState>(iterations, name, stepSettings, steps, clock);
 
         public static ForLoop<TState> Create(
             Func<TState?, int> setIterationCount,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<TState>>? steps = null) => new ForLoop<TState>(setIterationCount, name, stepSettings, steps);
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) => new ForLoop<TState>(setIterationCount, name, stepSettings, steps, clock);
 
         public static ForLoop<TState> Create(
             Func<TState?, CancellationToken, Task<int>> setIterationCountAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<TState>>? steps = null) => new ForLoop<TState>(setIterationCountAsync, name, stepSettings, steps);
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) => new ForLoop<TState>(setIterationCountAsync, name, stepSettings, steps, clock);
 
         protected override async Task ProcessAsync(TState? state, CancellationToken cancellationToken)
         {

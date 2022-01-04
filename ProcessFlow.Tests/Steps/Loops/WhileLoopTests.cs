@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using ProcessFlow.Data;
-using ProcessFlow.Steps;
 using ProcessFlow.Steps.Base;
 using ProcessFlow.Steps.Loops;
 using ProcessFlow.Tests.TestUtils;
@@ -17,7 +17,7 @@ namespace ProcessFlow.Tests.Steps.Loops
 
         public WhileLoopTests()
         {
-            _workflowState = new WorkflowState<SimpleWorkflowState>() { State = new SimpleWorkflowState() };
+            _workflowState = new WorkflowState<SimpleWorkflowState> { State = new SimpleWorkflowState() };
         }
 
         [Fact]
@@ -44,6 +44,43 @@ namespace ProcessFlow.Tests.Steps.Loops
             Assert.Equal(step1, whileLoop.Steps.First());
         }
 
+        [Fact]
+        public async void Create_WithShouldContinueSync_Succeeds()
+        {
+            // Arrange
+            var step1 = new BaseStep("one");
+            var step2 = new BaseStep("two");
+            var step3 = new BaseStep("three");
+
+            var baseStepList = new List<IStep<SimpleWorkflowState>> { step1, step2, step3 };
+            
+            // Act
+            var whileLoop = WhileLoop<SimpleWorkflowState>.Create(_ => false, steps: baseStepList);
+            var result = await whileLoop.ExecuteAsync(_workflowState);
+            
+            // Assert
+            whileLoop.Steps.Count.Should().Be(baseStepList.Count);
+            result.State.MyInteger.Should().Be(0);
+        }
+        
+        [Fact]
+        public async void Create_WithShouldContinueAsync_Succeeds()
+        {
+            // Arrange
+            var step1 = new BaseStep("one");
+            var step2 = new BaseStep("two");
+            var step3 = new BaseStep("three");
+
+            var baseStepList = new List<IStep<SimpleWorkflowState>> { step1, step2, step3 };
+            
+            // Act
+            var whileLoop = WhileLoop<SimpleWorkflowState>.Create(async (_, _) => await Task.FromResult(false), steps: baseStepList);
+            var result = await whileLoop.ExecuteAsync(_workflowState);
+            
+            // Assert
+            whileLoop.Steps.Count.Should().Be(baseStepList.Count);
+            result.State.MyInteger.Should().Be(0);
+        }
         
         
         [Fact]

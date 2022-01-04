@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using ProcessFlow.Data;
-using ProcessFlow.Steps;
 using ProcessFlow.Steps.Base;
 using ProcessFlow.Steps.Loops;
 using ProcessFlow.Tests.TestUtils;
@@ -160,6 +160,49 @@ namespace ProcessFlow.Tests.Steps.Loops
             Assert.Equal(iterations , result.State.MyInteger);
             Assert.Equal(iterations * 2 + 1, result.WorkflowChain.Count);
             Assert.Equal(iterations, forLoop.CurrentIteration); 
+        }
+
+        [Fact]
+        public void Create_WithIterationCount_CreatesSuccessfully()
+        {
+            // Arrange
+            var expectedIterationCount = 2;
+
+            // Act
+            var result = ForLoop<SimpleWorkflowState>.Create(expectedIterationCount);
+
+            // Assert
+            result.IterationCount.Should().Be(expectedIterationCount);
+        }
+        
+        [Fact]
+        public async void Create_WithIterationCountSync_CreatesSuccessfully()
+        {
+            // Arrange
+            Func<SimpleWorkflowState, int> setIterationCountSync = _ => 2;
+            var expectedIterationCount = setIterationCountSync(_workflowState.State);
+            var forLoop = ForLoop<SimpleWorkflowState>.Create(setIterationCountSync);
+
+            // Act
+            await forLoop.ExecuteAsync(_workflowState);
+
+            // Assert
+            forLoop.IterationCount.Should().Be(expectedIterationCount);
+        }
+        
+        [Fact]
+        public async void Create_WithIterationCountAsync_CreatesSuccessfully()
+        {
+            // Arrange
+            Func<SimpleWorkflowState?, CancellationToken, Task<int>> iterationCountAsync = (_, _) => Task.FromResult(2);
+            var expectedIterationCount = await iterationCountAsync(_workflowState.State, default);
+            var forLoop = ForLoop<SimpleWorkflowState>.Create(iterationCountAsync);
+
+            // Act
+            await forLoop.ExecuteAsync(_workflowState);
+
+            // Assert
+            forLoop.IterationCount.Should().Be(expectedIterationCount);
         }
     }
 }

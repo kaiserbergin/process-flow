@@ -11,7 +11,11 @@ namespace ProcessFlow.Steps.Loops
         protected int _currentIteration;
         protected List<IStep<T>> _steps;
 
-        protected AbstractLoop(string? name = null, StepSettings? stepSettings = null, List<IStep<T>>? steps = null) : base(name, stepSettings)
+        protected AbstractLoop(
+            string? name = null, 
+            StepSettings? stepSettings = null, 
+            List<IStep<T>>? steps = null,
+            IClock? clock = null) : base(name, stepSettings, clock)
         {
             _steps = steps ?? new List<IStep<T>>();
         }

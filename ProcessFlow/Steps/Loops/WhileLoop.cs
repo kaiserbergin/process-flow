@@ -36,13 +36,13 @@ namespace ProcessFlow.Steps.Loops
             Func<TState?, bool> shouldContinue,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<TState>>? steps = null) => new WhileLoop<TState>(shouldContinue, name, stepSettings);
+            List<IStep<TState>>? steps = null) => new WhileLoop<TState>(shouldContinue, name, stepSettings, steps);
 
         public static WhileLoop<TState> Create(
             Func<TState?, CancellationToken, Task<bool>> shouldContinueAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<IStep<TState>>? steps = null) => new WhileLoop<TState>(shouldContinueAsync, name, stepSettings);
+            List<IStep<TState>>? steps = null) => new WhileLoop<TState>(shouldContinueAsync, name, stepSettings, steps);
 
         protected override Task ProcessAsync(TState? state, CancellationToken cancellationToken) => Task.CompletedTask;
 
