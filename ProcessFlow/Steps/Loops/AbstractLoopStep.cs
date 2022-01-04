@@ -8,19 +8,17 @@ namespace ProcessFlow.Steps.Loops
     {
         private int _currentIteration = 0;
         public int CurrentIteration => _currentIteration;
-        
+
         public AbstractLoopStep(string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
-            : base(name, stepSettings, clock) { }
+            : base(name, stepSettings, clock)
+        {
+        }
 
-        private static BreakDelegate _break => throw new BreakException();
-        public void Break() => _break();
+        public void Break() => throw new BreakException();
+
+        public void Continue() => throw new ContinueException();
 
 
-        private static ContinueDelegate _continue => throw new ContinueException();
-
-        public void Continue() => _continue();
-        
-        
         internal void SetIteration(int currentIteration) => _currentIteration = currentIteration;
     }
 }

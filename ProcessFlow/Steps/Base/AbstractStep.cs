@@ -72,11 +72,9 @@ namespace ProcessFlow.Steps.Base
 
             return workflowState;
         }
-        
 
-        private static TerminateDelegate _terminate => throw new TerminateWorkflowException();
 
-        public void Terminate() => _terminate();
+        public void Terminate() => throw new TerminateWorkflowException();
 
         protected abstract Task ProcessAsync(TState? state, CancellationToken cancellationToken);
 

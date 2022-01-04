@@ -9,11 +9,11 @@ namespace ProcessFlow.Steps.Selectors
 {
     public sealed class StepSelector<TState> : AbstractStepSelector<TState> where TState: class
     {
-        private readonly Func<WorkflowState<TState>?, Dictionary<string, IStep<TState>>, Action, CancellationToken, Task<List<IStep<TState>>>>? _selectAsync;
-        private readonly Func<WorkflowState<TState>?, Dictionary<string, IStep<TState>>, Action, List<IStep<TState>>>? _selectSync;
+        private readonly SelectAsyncDelegate? _selectAsync;
+        private readonly SelectSyncDelegate? _selectSync;
         
         internal StepSelector(
-            Func<WorkflowState<TState>?, Dictionary<string, IStep<TState>>, Action, CancellationToken, Task<List<IStep<TState>>>> selectAsync,
+            SelectAsyncDelegate selectAsync,
             Dictionary<string, IStep<TState>> options,
             string? name = null,
             StepSettings? stepSettings = null,
@@ -24,7 +24,7 @@ namespace ProcessFlow.Steps.Selectors
         }
         
         internal StepSelector(
-            Func<WorkflowState<TState>?, Dictionary<string, IStep<TState>>, Action, List<IStep<TState>>> selectSync,
+            SelectSyncDelegate selectSync,
             Dictionary<string, IStep<TState>> options,
             string? name = null,
             StepSettings? stepSettings = null,
@@ -34,16 +34,26 @@ namespace ProcessFlow.Steps.Selectors
             _selectSync = selectSync;
         }
 
+        public delegate Task<List<IStep<TState>>> SelectAsyncDelegate(
+            WorkflowState<TState>? state,
+            Dictionary<string, IStep<TState>> options,
+            Action terminate,
+            CancellationToken cancellationToken = default);
 
         public static IStepSelector<TState> Create(
-            Func<WorkflowState<TState>?, Dictionary<string, IStep<TState>>, Action, CancellationToken, Task<List<IStep<TState>>>> selectAsyncFunc,
+            SelectAsyncDelegate selectAsyncFunc,
             Dictionary<string, IStep<TState>> options,
             string? name = null,
             StepSettings? stepSettings = null,
             IClock? clock = null) => new StepSelector<TState>(selectAsyncFunc, options, name, stepSettings, clock);
         
+        public delegate List<IStep<TState>> SelectSyncDelegate(
+            WorkflowState<TState>? state,
+            Dictionary<string, IStep<TState>> options,
+            Action terminate);
+        
         public static IStepSelector<TState> Create(
-            Func<WorkflowState<TState>?, Dictionary<string, IStep<TState>>, Action, List<IStep<TState>>> selectSync,
+            SelectSyncDelegate selectSync,
             Dictionary<string, IStep<TState>> options,
             string? name = null,
             StepSettings? stepSettings = null,

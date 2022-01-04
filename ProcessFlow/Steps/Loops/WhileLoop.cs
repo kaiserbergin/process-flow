@@ -31,7 +31,7 @@ namespace ProcessFlow.Steps.Loops
         {
             _shouldContinueAsync = shouldContinueAsync;
         }
-
+        
         public static WhileLoop<TState> Create(
             Func<TState?, bool> shouldContinue,
             string? name = null,
