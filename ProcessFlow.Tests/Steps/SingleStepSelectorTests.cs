@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
 using ProcessFlow.Tests.TestUtils;
 using Xunit;
 
@@ -24,11 +25,11 @@ namespace ProcessFlow.Tests.Steps
             var selector = new BaseSelector();
             var expectedOption = new BaseStep(name: "expectedOption");
             var option = new BaseStep(name: "option");
-            var options = new List<Step<SimpleWorkflowState>>() { expectedOption, option };
+            var options = new List<IStep<SimpleWorkflowState>>() { expectedOption, option };
             selector.SetOptions(options);
 
             // Act
-            var result = await selector.Execute(_workflowState);
+            var result = await selector.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(2, result.WorkflowChain.Count);

@@ -10,8 +10,52 @@ processes ran or how each one affected your state.
 Simply install via nuget in your favorite IDE (it's Rider), or use the command line.
 
 ```powershell
-Install-Package Process.Flow -Version 0.0.15
+Install-Package Process.Flow -Version 0.1.0
 ```
+
+## Release 0.1.0 Release Notes:
+It's been too long, but I'm finally releasing version 0.1.0! What's new you ask? Fluent Steps, better
+cancellation token support, publicly exposed interfaces, Dictionary support for selector steps, and... maybe more. I don't remember. 
+But let's take a look at how this might shape your usage of the library.
+
+### Better Cancellation Token Support
+The `ProcessAsync` method has replaced the `Process` method in the new `AbstractStep` class.
+This is a breaking change as you will need to inherit from `AbstractStep` instead of `Step` 
+and change your method signature, which now has a `CancellationToken` like a real async method.
+I apologize for the inconvenience of this breaking change, but I think it's a much healthier
+and clearer direction for the library. I know folks who have been using it have been forced
+to persist the CancellationToken in state, and that's... just weird. I've also retooled things
+to hopefully protect against major breaking changes in the future. We'll see how that goes.
+
+### Fluent Steps
+
+Previously, in order to create a step, you often _needed_ to implement the abstract step class.
+This still works, and is great for projects where your steps are leveraging dependency injection.
+But there are other use cases where you may not need to implement something that requires DI, or
+you may not even want to return the end state And why would you in the first place since it's persisted)
+across steps? Yeah, that requirement is gone now, too. So if you just need a light touch 
+implementation of steps and processes, you might end up with something like this:
+
+```c#
+// Async example
+var myAsyncStep = Step<SomeStateClass>.Create(async (state, terminate, cancellationToken) =>
+{
+    ... Do some async work ...
+});
+
+// Sync example
+var mySyncStep = Ste<SomeStateClass>.Create((state, terminate) => { .. some sync work ... });
+```
+
+Not to shabby, eh? You can still chain steps fluently with `SetNextStep()`, `Fork()`, and all
+your favorites. I'm hoping this addition gives y'all some flexibility to do more with the lib.
+Enjoy!
+
+### Selector updated to support Dictionaries
+
+Another big upgrade is that the `StepSector` now works with a `Dictionary` instead of
+the basic `List` implementation which will allow you to more easily identify which step(s) you
+want to execute based on your decision logic!
 
 ## Usage
 
@@ -138,9 +182,9 @@ Here's where my heads at and where I want to take this
 - [x] ~~Forks~~
 - [x] ~~Add WorkflowState settings to effectively act as a default for step settings~~
 - [x] ~~Better nullable support~~
-- [ ] Fluent step creation (I don't wanna make classes all the time)
-- [ ] String expression support for fluent steps
-- [ ] Other cool stuff? 
+- [x] ~~Fluent step creation (I don't wanna make classes all the time)~~
+- [ ] Split DI into it's own library like other normal libs
+- [ ] Other cool stuff? Let me know what you want! 
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

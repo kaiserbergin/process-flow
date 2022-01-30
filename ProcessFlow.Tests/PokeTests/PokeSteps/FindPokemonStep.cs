@@ -1,18 +1,20 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Bogus;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
 using ProcessFlow.Tests.PokeTests.PokeData;
 
 namespace ProcessFlow.Tests.PokeTests.PokeSteps
 {
-    public class FindPokemonStep : Step<PokeState>
+    public class FindPokemonStep : AbstractStep<PokeState>
     {
         public FindPokemonStep(string name = null, StepSettings stepSettings = null, IClock clock = null) : base(name, stepSettings, clock)
         {
         }
 
-        protected override Task<PokeState> Process(PokeState state)
+        protected override Task ProcessAsync(PokeState state, CancellationToken cancellationToken)
         {
             state.EncounteredMon = new Faker<Pokemon>()
                 .StrictMode(false)
@@ -21,7 +23,7 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
                 .RuleFor(p => p.BaseCaptureChance, f => f.Random.Double(.1d, .5d))
                 .Generate();
 
-            return Task.FromResult(state);
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Bogus;
 using ProcessFlow.Data;
@@ -6,13 +7,13 @@ using ProcessFlow.Tests.PokeTests.PokeData;
 
 namespace ProcessFlow.Tests.PokeTests.PokeSteps
 {
-    public class CatchPokemonStep : LoopStep<PokeState>
+    public class CatchPokemonStep : AbstractLoopStep<PokeState>
     {
         public CatchPokemonStep(string name = null, StepSettings stepSettings = null, IClock clock = null) : base(name, stepSettings, clock)
         {
         }
 
-        protected override Task<PokeState> Process(PokeState state)
+        protected override Task ProcessAsync(PokeState state, CancellationToken cancellationToken)
         {
             if (state.PokeBallCount == 0 || state.EncounteredMon == null)
                 Break();
@@ -37,8 +38,8 @@ namespace ProcessFlow.Tests.PokeTests.PokeSteps
 
             if (CurrentIteration == 3)
                 state.EncounteredMon = null; // Ran away!
-        
-            return Task.FromResult(state);
+            
+            return Task.CompletedTask;
         }
     }
 }

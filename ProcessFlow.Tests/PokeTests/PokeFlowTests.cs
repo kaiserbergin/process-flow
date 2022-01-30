@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
 using ProcessFlow.Steps.Loops;
 using ProcessFlow.Tests.PokeTests.PokeData;
 using ProcessFlow.Tests.PokeTests.PokeSteps;
@@ -26,14 +27,14 @@ namespace ProcessFlow.Tests.PokeTests
             
             var catchLoop = new ForLoop<PokeState>(
                 iterations: catchAttemptsPerMon,
-                steps: new List<Step<PokeState>> { catchPokemonStep },
+                steps: new List<IStep<PokeState>> { catchPokemonStep },
                 stepSettings: settings);
 
             var getMorePokeBallsStep = new GetMorePokeBallsStep(stepSettings: settings);
             var releaseEamAllStep = new ReleaseEmAllStep(stepSettings: settings);
 
             var pickYourPathStep = new PickYourPathSelector(stepSettings: settings);
-            pickYourPathStep.SetOptions(new List<Step<PokeState>> { findPokemonStep, getMorePokeBallsStep, releaseEamAllStep });
+            pickYourPathStep.SetOptions(new List<IStep<PokeState>> { findPokemonStep, getMorePokeBallsStep, releaseEamAllStep });
 
             var walkStep = new WalkStep(stepSettings: settings);
             var chewGumStep = new ChewGumStep(stepSettings: settings);
@@ -47,7 +48,7 @@ namespace ProcessFlow.Tests.PokeTests
             releaseEamAllStep.Fork(name: "someName", stepSettings: settings, walkStep, chewGumStep);
 
             // Actssert
-            await findPokemonStep.Execute(new WorkflowState<PokeState> { State = pokeState });
+            await findPokemonStep.ExecuteAsync(new WorkflowState<PokeState> { State = pokeState });
         }
     }
 }

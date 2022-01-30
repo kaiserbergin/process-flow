@@ -1,61 +1,87 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
+using ProcessFlow.Steps.Base;
 
 namespace ProcessFlow.Steps.Loops
 {
-    public sealed class ForLoop<T> : Loop<T> where T : class
+    public sealed class ForLoop<TState> : AbstractLoop<TState> where TState : class
     {
         private int _iterationCount;
-        private readonly Func<T?, int>? _setIterationCount;
-        private readonly Func<T?, Task<int>>? _setIterationCountAsync;
+        private readonly Func<TState?, int>? _setIterationCount;
+        private readonly Func<TState?, CancellationToken, Task<int>>? _setIterationCountAsync;
+
+        public int IterationCount => _iterationCount;
 
         public ForLoop(
             int iterations,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) : base(name, stepSettings, steps, clock)
         {
             _iterationCount = iterations;
         }
-        
+
         public ForLoop(
-            Func<T?, int> setIterationCount,
+            Func<TState?, int> setIterationCount,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) : base(name, stepSettings, steps, clock)
         {
             _setIterationCount = setIterationCount;
         }
 
         public ForLoop(
-            Func<T?, Task<int>> setIterationCountAsync,
+            Func<TState?, CancellationToken, Task<int>> setIterationCountAsync,
             string? name = null,
             StepSettings? stepSettings = null,
-            List<Step<T>>? steps = null) : base(name, stepSettings, steps)
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) : base(name, stepSettings, steps, clock)
         {
             _setIterationCountAsync = setIterationCountAsync;
         }
 
-        protected override async Task<T?> Process(T? state)
+        public static ForLoop<TState> Create(
+            int iterations,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) => new ForLoop<TState>(iterations, name, stepSettings, steps, clock);
+
+        public static ForLoop<TState> Create(
+            Func<TState?, int> setIterationCount,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) => new ForLoop<TState>(setIterationCount, name, stepSettings, steps, clock);
+
+        public static ForLoop<TState> Create(
+            Func<TState?, CancellationToken, Task<int>> setIterationCountAsync,
+            string? name = null,
+            StepSettings? stepSettings = null,
+            List<IStep<TState>>? steps = null,
+            IClock? clock = null) => new ForLoop<TState>(setIterationCountAsync, name, stepSettings, steps, clock);
+
+        protected override async Task ProcessAsync(TState? state, CancellationToken cancellationToken)
         {
             if (_setIterationCount != null)
                 _iterationCount = _setIterationCount(state);
             else if (_setIterationCountAsync != null)
-                _iterationCount = await _setIterationCountAsync(state).ConfigureAwait(false);
-
-            return state;
+                _iterationCount = await _setIterationCountAsync(state, cancellationToken).ConfigureAwait(false);
         }
 
-        protected override async Task<WorkflowState<T>> ExecuteExtensionProcess(WorkflowState<T> workflowState)
+        protected override async Task ExecuteExtensionProcessAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken)
         {
             for (var i = 0; i < _iterationCount; i++)
             {
                 try
                 {
-                    await Iterate(workflowState);
+                    await IterateAsync(workflowState, cancellationToken);
                 }
                 catch (ContinueException)
                 {
@@ -69,9 +95,6 @@ namespace ProcessFlow.Steps.Loops
 
                 _currentIteration++;
             }
-            return workflowState;
         }
     }
-    
-    
 }

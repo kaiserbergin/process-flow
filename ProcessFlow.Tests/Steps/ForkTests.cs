@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
 using ProcessFlow.Data;
 using ProcessFlow.Exceptions;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
 using ProcessFlow.Tests.TestUtils;
 using Xunit;
 
@@ -44,7 +46,7 @@ namespace ProcessFlow.Tests.Steps
             var expectedExecutionCompletionOrder = new[] { firstStepName, thirdStepName, fourthStepName, secondStepName, forkStepName };
 
             // Act
-            var result = await firstBaseStep.Execute(_workflowState);
+            var result = await firstBaseStep.ExecuteAsync(_workflowState);
 
             var orderedByStarted = result.WorkflowChain.ToList().Select(x => x.StepName).ToArray();
             var orderedByCompletion = result.WorkflowChain.ToList()
@@ -77,9 +79,7 @@ namespace ProcessFlow.Tests.Steps
             firstBaseStep.Fork(
                 name: forkStepName,
                 stepSettings: settings,
-                secondStepAsync,
-                exceptionalStep,
-                fourthStepAsync);
+                new List<IStep<SimpleWorkflowState>> { secondStepAsync, exceptionalStep, fourthStepAsync });
 
             var expectedExecutionStarted = new[] { firstStepName, forkStepName, secondStepName, exceptionalStepName, fourthStepName };
             var expectedExecutionCompletionOrder = new[] { firstStepName, fourthStepName, secondStepName };
@@ -88,7 +88,7 @@ namespace ProcessFlow.Tests.Steps
             // Actssert
             try
             {
-                await firstBaseStep.Execute(_workflowState);
+                await firstBaseStep.ExecuteAsync(_workflowState);
             }
             catch (WorkflowActionException<SimpleWorkflowState> ex)
             {

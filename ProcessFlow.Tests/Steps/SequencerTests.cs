@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ProcessFlow.Data;
 using ProcessFlow.Steps;
+using ProcessFlow.Steps.Base;
+using ProcessFlow.Steps.Sequencers;
 using ProcessFlow.Tests.TestUtils;
 using Xunit;
 
@@ -35,10 +37,10 @@ namespace ProcessFlow.Tests.Steps
             sequencer.AddStep(firstStep);
             sequencer.AddStep(secondStep);
 
-            var expectedSequence = new List<Step<SimpleWorkflowState>> { firstStep, secondStep };
+            var expectedSequence = new List<AbstractStep<SimpleWorkflowState>> { firstStep, secondStep };
 
             // Act
-            var result = await sequencer.Execute(_workflowState);
+            var result = await sequencer.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(_originalWorfklowState.MyInteger + 2, result.State.MyInteger);
@@ -72,12 +74,12 @@ namespace ProcessFlow.Tests.Steps
             var firstStep = new BaseStep(name: firstStepName, settings);
             var secondStep = new BaseStep(name: secondStepName, settings);
 
-            var expectedSequence = new List<Step<SimpleWorkflowState>> { firstStep, secondStep };
+            var expectedSequence = new List<IStep<SimpleWorkflowState>> { firstStep, secondStep };
 
             sequencer.SetSequence(expectedSequence);
 
             // Act
-            var result = await sequencer.Execute(_workflowState);
+            var result = await sequencer.ExecuteAsync(_workflowState);
 
             // Assert
             Assert.Equal(_originalWorfklowState.MyInteger + 2, result.State.MyInteger);
@@ -94,6 +96,26 @@ namespace ProcessFlow.Tests.Steps
             Assert.Equal(1, firstStepLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
             Assert.Equal(secondStep.Id, secondStepLink.StepIdentifier);
             Assert.Equal(2, secondStepLink.GetUncompressedStateSnapshot<SimpleWorkflowState>().MyInteger);
+        }
+
+        [Fact]
+        public void Create_WithSteps_CreatesSuccessfully()
+        {
+            // Arrange
+            const string firstStepName = "first";
+            const string secondStepName = "second";
+            var stepSettings = new StepSettings();
+
+            var firstStep = new BaseStep(name: firstStepName, stepSettings: stepSettings);
+            var secondStep = new BaseStep(name: secondStepName, stepSettings: stepSettings);
+
+            var expectedOptions = new List<IStep<SimpleWorkflowState>> { firstStep, secondStep };
+
+            // Act
+            var result = Sequencer<SimpleWorkflowState>.Create(expectedOptions);
+
+            // Assert
+            Assert.True(expectedOptions.SequenceEqual(result.GetSequence()));
         }
 
     }

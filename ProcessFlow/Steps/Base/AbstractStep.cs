@@ -1,51 +1,53 @@
-﻿using ProcessFlow.Data;
-using ProcessFlow.Exceptions;
-using System;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
+using ProcessFlow.Data;
+using ProcessFlow.Exceptions;
 
-namespace ProcessFlow.Steps
+namespace ProcessFlow.Steps.Base
 {
-    public abstract class Step<TState> where TState : class
+    public abstract class AbstractStep<TState> : IStep<TState> where TState : class
     {
         public string Name { get; private set; }
         public string Id { get; private set; }
+        public StepSettings? StepSettings { get; private set; }
 
-        private Step<TState>? _next;
-        private Step<TState>? _previous;
+        private IStep<TState>? _next;
+        private IStep<TState>? _previous;
 
-        private StepSettings? _stepSettings;
         private IClock _clock;
 
-        public Step(string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
+        public AbstractStep(string? name = null, StepSettings? stepSettings = null, IClock? clock = null)
         {
             Name = name ?? GetType().Name;
             Id = Guid.NewGuid().ToString("N");
-            _stepSettings = stepSettings;
+            StepSettings = stepSettings;
             _clock = clock ?? new Clock();
         }
 
-        public Step<TState>? Next()
+        public IStep<TState>? Next()
         {
             return _next;
         }
 
-        public Step<TState>? Previous()
+        public IStep<TState>? Previous()
         {
             return _previous;
         }
 
-        public async Task<WorkflowState<TState>> Execute(WorkflowState<TState> workflowState)
+        public async Task<WorkflowState<TState>> ExecuteAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken = default)
         {
             var currentLink = CreateWorkflowChainLink(workflowState);
 
             try
             {
-                workflowState.State = await Process(workflowState.State);
+                await ProcessAsync(workflowState.State, cancellationToken);
 
-                if (_stepSettings?.TrackStateChanges ?? workflowState.DefaultStepSettings?.TrackStateChanges ?? false) TakeDataSnapShot(workflowState, currentLink);
+                TakeDataSnapShot(workflowState, currentLink);
 
-                await ExecuteExtensionProcess(workflowState);
-                
+                await ExecuteExtensionProcessAsync(workflowState, cancellationToken);
+
                 AddActivityToWorkflowChainLink(StepActivityStages.ExecutionCompleted, currentLink);
             }
             catch (LoopJumpException)
@@ -54,25 +56,29 @@ namespace ProcessFlow.Steps
             }
             catch (TerminateWorkflowException)
             {
+                TakeDataSnapShot(workflowState, currentLink);
                 AddActivityToWorkflowChainLink(StepActivityStages.ExecutionTerminated, currentLink);
+                return workflowState;
             }
             catch (Exception exception)
             {
+                TakeDataSnapShot(workflowState, currentLink);
                 AddActivityToWorkflowChainLink(StepActivityStages.ExecutionFailed, currentLink);
                 throw new WorkflowActionException<TState>("Exception in Process Flow execution. See InnerException for details.", exception, workflowState);
             }
 
-            if (_stepSettings?.AutoProgress ?? workflowState.DefaultStepSettings?.AutoProgress ?? false)
-                return await ExecuteNext(workflowState);
+            if (StepSettings?.AutoProgress ?? workflowState.DefaultStepSettings?.AutoProgress ?? false)
+                return await ExecuteNextAsync(workflowState, cancellationToken);
 
             return workflowState;
         }
 
+
         public void Terminate() => throw new TerminateWorkflowException();
 
-        protected abstract Task<TState?> Process(TState? state);
+        protected abstract Task ProcessAsync(TState? state, CancellationToken cancellationToken);
 
-        protected virtual Task<WorkflowState<TState>> ExecuteExtensionProcess(WorkflowState<TState> workflowState) => Task.FromResult(workflowState);
+        protected virtual Task ExecuteExtensionProcessAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken) => Task.FromResult(workflowState);
 
         private WorkflowChainLink CreateWorkflowChainLink(WorkflowState<TState> workflowState)
         {
@@ -85,34 +91,36 @@ namespace ProcessFlow.Steps
                 sequenceNumber: previousLink?.Value?.SequenceNumber + 1 ?? 0,
                 stepActivity: new StepActivity(StepActivityStages.Executing, _clock.UtcNow())
             );
-            
+
             chain.AddLast(link);
 
             return link;
         }
 
-        private void TakeDataSnapShot(WorkflowState<TState> workflowState, WorkflowChainLink link) =>
-            link.SetStateSnapshot(workflowState.State);
+        private void TakeDataSnapShot(WorkflowState<TState> workflowState, WorkflowChainLink link)
+        {
+            if (StepSettings?.TrackStateChanges ?? workflowState.DefaultStepSettings?.TrackStateChanges ?? false)
+                link.SetStateSnapshot(workflowState.State);
+        }
 
         private void AddActivityToWorkflowChainLink(StepActivityStages stepActivityStage, WorkflowChainLink link) =>
             link.StepActivities.Add(new StepActivity(stepActivityStage, _clock.UtcNow()));
 
 
-        protected async Task<WorkflowState<TState>> ExecuteNext(WorkflowState<TState> workflowState)
+        protected async Task<WorkflowState<TState>> ExecuteNextAsync(WorkflowState<TState> workflowState, CancellationToken cancellationToken)
         {
             if (_next != null)
-                return await _next.Execute(workflowState);
-            else
-                return workflowState;
+                return await _next.ExecuteAsync(workflowState, cancellationToken);
+            return workflowState;
         }
 
-        public Step<TState> SetNextStep(Step<TState> step)
+        public IStep<TState> SetNextStep(IStep<TState> step)
         {
             _next = step;
             return _next;
         }
 
-        public Step<TState> SetPreviousStep(Step<TState> step)
+        public IStep<TState> SetPreviousStep(IStep<TState> step)
         {
             _previous = step;
             return _previous;
